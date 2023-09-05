@@ -1,0 +1,305 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String   @id @default(uuid())
+    email     String   @unique
+    password  String
+    firstName String?
+    lastName  String?
+    address   String?
+    phone     String?
+    createdAt DateTime @default(now())
+
+    orders              Order[]
+    Auction             Auction[]
+    Address             Address[]
+    PaymentMethodDetail PaymentMethodDetail[]
+}
+
+model Store {
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+    address     String?
+    phone       String?
+}
+
+model Product {
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+    price       Float
+    image       String?
+    batches     Batch[]
+
+    categoryId String?
+    OrderItem  OrderItem[]
+    Category   Category?   @relation(fields: [categoryId], references: [id])
+    Comment    Comment[]
+    auctionId  String?
+    Auction    Auction[]   @relation("AuctionToProduct")
+
+    inOutHistories InOutHistory[]
+    ProductVariant ProductVariant[]
+}
+
+model Category {
+    id          String  @id @default(uuid())
+    name        String
+    description String?
+
+    products Product[]
+}
+
+// model ProductAttribute {
+//     id    String @id @default(uuid())
+//     name  String
+//     value String
+
+//     productId String
+//     product   ProductVariant @relation(fields: [productId], references: [id])
+// }
+
+model ProductVariant {
+    id         String   @id @default(uuid())
+    product    Product  @relation(fields: [productId], references: [id])
+    productId  String
+    sku        String?  @unique
+    stock      Int
+    price      Float
+    attributes Json
+    // attributes ProductAttribute[]
+    createdAt  DateTime @default(now())
+    orders     Order[]  @relation("ProductVariantOrder")
+}
+
+model InOutHistory {
+    id        String   @id @default(uuid())
+    inOutType String
+    amount    Int
+    createdAt DateTime @default(now())
+
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
+    Batch     Batch?  @relation(fields: [batchId], references: [id])
+    batchId   String?
+    order     Order?  @relation(fields: [orderId], references: [id])
+    orderId   String?
+}
+
+model Batch {
+    id             String          @id @default(uuid())
+    product        Product         @relation(fields: [productId], references: [id])
+    productId      String
+    expirationDate DateTime
+    stock          Int
+    inOutHistories InOutHistory[]
+    ReturnedBatch  BatchReturned[]
+}
+
+model BatchReturned {
+    id        String   @id @default(uuid())
+    batch     Batch    @relation(fields: [batchId], references: [id])
+    batchId   String
+    amount    Int
+    reason    String?
+    createdAt DateTime @default(now())
+}
+
+enum InOutType {
+    IN
+    OUT
+}
+
+model Order {
+    id                   String      @id @default(uuid())
+    createdAt            DateTime    @default(now())
+    status               OrderStatus @default(PENDING)
+    shippingCost         Float
+    totalAmount          Float
+    paymentMethod        String
+    shippingAddress      String
+    returnReason         String?
+    returnApprovalStatus String?     @default("PENDING") //"APPROVED", "REJECTED"
+    discountAmount       Float?
+
+    userId               String
+    deliveryAddressId    String?
+    items                OrderItem[]
+    user                 User                   @relation(fields: [userId], references: [id])
+    products             ProductVariant[]       @relation("ProductVariantOrder")
+    InOutHistory         InOutHistory[]
+    PaymentTransaction   PaymentTransaction[]
+    DeliveryAddress      Address?               @relation(fields: [deliveryAddressId], references: [id])
+    OrderStatusHistory   OrderStatusHistory[]
+    OrderPromotionDetail OrderPromotionDetail[]
+}
+
+model OrderItem {
+    id           String  @id @default(uuid())
+    quantity     Int
+    price        Float
+    returnStatus String? @default("PENDING") // "RETURN_REQUESTED", "RETURNED".
+
+    productId String
+    orderId   String
+    order     Order   @relation(fields: [orderId], references: [id])
+    product   Product @relation(fields: [productId], references: [id])
+}
+
+model OrderStatusHistory {
+    id          String      @id @default(uuid())
+    reason      String?
+    order       Order       @relation(fields: [orderId], references: [id])
+    orderId     String
+    orderStatus OrderStatus
+    dateTime    DateTime    @default(now())
+}
+
+enum OrderStatus {
+    CREATED
+    PENDING
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELED
+}
+
+model Address {
+    id          String  @id @default(uuid())
+    recipient   String
+    phoneNumber String?
+    street      String
+    city        String
+    state       String
+    country     String
+    zipCode     String
+    user        User    @relation(fields: [userId], references: [id])
+    userId      String
+    orders      Order[]
+}
+
+model Auction {
+    id           String   @id @default(uuid())
+    startTime    DateTime
+    endTime      DateTime
+    startPrice   Float
+    minIncrement Float
+
+    productId String
+    winnerId  String?
+    product   Product[] @relation("AuctionToProduct")
+    winner    User?     @relation(fields: [winnerId], references: [id])
+
+    // Những field khác cho phép người dùng đấu giá   
+}
+
+model Promotion {
+    id              String            @id @default(uuid())
+    name            String
+    description     String?
+    startTime       DateTime
+    endTime         DateTime
+    PromotionDetail PromotionDetail[]
+}
+
+model PromotionDetail {
+    id                   String                 @id @default(uuid())
+    promotion            Promotion              @relation(fields: [promotionId], references: [id])
+    promotionId          String
+    code                 String
+    type                 PromotionType
+    value                Float
+    createdAt            DateTime               @default(now())
+    applyMonth           Int
+    applyYear            Int
+    remainingUses        Int                    @default(1)
+    OrderPromotionDetail OrderPromotionDetail[]
+}
+
+model OrderPromotionDetail {
+    id                String          @id @default(uuid())
+    order             Order           @relation(fields: [orderId], references: [id])
+    orderId           String
+    promotionDetail   PromotionDetail @relation(fields: [promotionDetailId], references: [id])
+    promotionDetailId String
+    discountAmount    Float
+    code              String?
+}
+
+enum PromotionType {
+    PERCENT_OFF
+    AMOUNT_OFF
+}
+
+model PaymentTransaction {
+    id            String        @id @default(uuid())
+    amount        Float
+    paid          Boolean?      @default(false)
+    transactionId String?
+    paymentMethod PaymentMethod @default(Other)
+    type          PaymentType?
+    paymentStatus PaymentStatus @default(PENDING)
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+
+    orderId String
+    order   Order  @relation(fields: [orderId], references: [id])
+}
+
+model PaymentMethodDetail {
+    id            String        @id @default(uuid())
+    user          User          @relation(fields: [userId], references: [id])
+    userId        String
+    paymentMethod PaymentMethod
+    apiKey        String?
+    //...
+}
+
+enum PaymentType {
+    ORDER_PAYMENT
+    REFUND
+}
+
+enum PaymentMethod {
+    Wallet
+    CreditCard
+    BankTransfer
+    Other
+}
+
+enum PaymentStatus {
+    PENDING
+    CANCELED
+    COMPLETED
+    FAILED
+}
+
+model Comment {
+    id     String @id @default(uuid())
+    title  String
+    body   String
+    rating Int    @default(0)
+
+    productId String
+    parentId  String?
+    product   Product   @relation(fields: [productId], references: [id])
+    Comment   Comment?  @relation("ReplyToComment", fields: [parentId], references: [id])
+    replies   Comment[] @relation("ReplyToComment")
+}
+
+model MediaFile {
+    id          Int      @id @default(autoincrement())
+    url         String
+    type        String // image, video
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
