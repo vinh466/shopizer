@@ -1,7 +1,8 @@
+import { OGDashboard } from '@shopizer/organisms';
 import React from 'react';
 
 function SalesDashboard() {
-  return <div>Sales Dashboard Page</div>;
+  return <OGDashboard />;
 }
 
 export default SalesDashboard;

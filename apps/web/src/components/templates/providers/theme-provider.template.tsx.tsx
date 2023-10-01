@@ -5,10 +5,16 @@ import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
 import type Entity from '@ant-design/cssinjs/es/Cache';
 import { useServerInsertedHTML } from 'next/navigation';
 import { ConfigProvider } from 'antd';
-import theme from '@shopizer/configs/theme.config';
+import { antdDarkTheme, antdLightTheme } from '@shopizer/configs/theme.config';
+import { useRecoilValue } from 'recoil';
+import { themeState } from '@shopizer/stores';
+import { useIsClientSide } from '@shopizer/hooks';
 
 export const TThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const cache = React.useMemo<Entity>(() => createCache(), [createCache]);
+  const themeType = useRecoilValue(themeState);
+  const isClientSide = useIsClientSide();
+  const theme = themeType === 'dark' ? antdDarkTheme : antdLightTheme;
   useServerInsertedHTML(() => (
     <style
       id="antd"
@@ -17,7 +23,9 @@ export const TThemeProvider = ({ children }: { children: React.ReactNode }) => {
   ));
   return (
     <StyleProvider cache={cache}>
-      <ConfigProvider theme={theme}>{children}</ConfigProvider>
+      {isClientSide && (
+        <ConfigProvider theme={theme}>{children}</ConfigProvider>
+      )}
     </StyleProvider>
   );
 };

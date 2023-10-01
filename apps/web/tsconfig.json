@@ -33,9 +33,10 @@
       "@shopizer/configs/*": ["src/configs/*"],
       "@shopizer/hooks": ["src/hooks/index.ts"],
       "@shopizer/utils/*": ["src/utils/*"],
+      "@shopizer/types/*": ["src/types/*"],
       "@shopizer/enums/*": ["src/enums/*"],
       "@shopizer/apis/*": ["src/apis/*"],
-      "@shopizer/stores/*": ["src/stores/*"]
+      "@shopizer/stores": ["src/stores/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Layout, Menu } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -13,6 +13,7 @@ import {
   SALES_PRODUCT_PAGE,
   SALES_SHOP_PAGE,
 } from '@shopizer/constants';
+import { TContainer } from '@shopizer/templates';
 
 const { Content, Header, Sider } = Layout;
 
@@ -22,14 +23,14 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
   const pathName = usePathname();
   return (
     <>
-      <Layout style={{ minHeight: '100vh' }} hasSider>
+      <Layout style={{ minHeight: '100vh', minWidth: '1200px' }} hasSider>
         <Sider
           trigger={null}
           collapsible
           collapsed={collapsed}
           style={{
             overflow: 'auto',
-            height: '100vh',
+            minHeight: '100vh',
           }}
         >
           <div
@@ -41,7 +42,6 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
             }}
           />
           <Menu
-            theme="dark"
             mode="inline"
             selectedKeys={[pathName]}
             items={[
@@ -105,6 +105,7 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                 height: 64,
               }}
             />
+            Dashboard / Product
           </Header>
           <Content
             style={{
