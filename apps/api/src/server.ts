@@ -4,13 +4,14 @@ import AuthenticationController from "@shopizer/modules/authentication/authentic
 import UserController from "@shopizer/modules/user/user.controller";
 import ProductController from "./modules/product/product.controller";
 import validateEnv from "@shopizer/helpers/validateEnv";
+import { OrderController } from "./modules/order/order.controller";
 
 validateEnv();
-console.log(process.env.DATABASE_URL);
 const app = new App([
-  new AuthenticationController(),
-  new UserController(),
-  new ProductController(),
+  OrderController,
+  AuthenticationController,
+  UserController,
+  ProductController,
 ]);
 
 app.listen();
