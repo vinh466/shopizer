@@ -1,14 +1,27 @@
 'use client';
 
-import { RequireOnlyOne } from '@shopizer/types/commons';
+import { FormMeta, RequireOnlyOne } from '@shopizer/types/commons';
 import { createQueryString } from '@shopizer/utils/data';
-import { Table, Tabs } from 'antd';
+import { Badge, Button, Collapse, Form, Input, Space, Table, Tabs } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import { OGDrawerTableFilter } from './widgets/drawer-tabs-table-filter.organism';
+import { OGTableResource } from './table-resource.organism';
 interface TabTableData<TableRecordType = any> {
+  /**
+   * Using this field will cause the tab to self-manage tab switching. (replacement for tabKey, tabHref)
+   */
+  tabId: string;
+  /**
+   * Using this field will cause the tab manager to switch tabs via the url parameter (replacement for tabId, tabHref)
+   *
+   * Can be set parameter name via `tabKeyParamName` prop
+   */
   tabKey: string;
+  /**
+   * Using this field will cause the tab manager to switch tabs via the url (replacement for tabId, tabHref)
+   */
   tabHref: string;
   tabLabel: string;
   tableCol: ColumnsType<TableRecordType>;
@@ -16,10 +29,10 @@ interface TabTableData<TableRecordType = any> {
 }
 
 /**
- * @description Only one `tabHref` or `tabKey` field can be used in a tab
+ * @description Only one in `tabHref`, `tabKey`, `tabId` field can be used in a tab
  */
 export type TabTable = Array<
-  RequireOnlyOne<TabTableData, 'tabHref' | 'tabKey'>
+  RequireOnlyOne<TabTableData, 'tabHref' | 'tabKey' | 'tabId'>
 >;
 /**
  *
@@ -34,6 +47,7 @@ interface OGTabsTableProps {
    * This is useful when there are multiple tab tables on the page
    */
   tabKeyParamName?: string;
+  filterForm?: FormMeta;
 }
 
 export function OGTabsTable(props: OGTabsTableProps) {
@@ -41,16 +55,19 @@ export function OGTabsTable(props: OGTabsTableProps) {
   const routePathName = usePathname();
   const routeParams = useSearchParams();
   const [activeTabKey, setActiveTabKey] = useState<string>();
+  const [filter, setFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState<string[]>([]);
   const tabKeyParamName = props.tabKeyParamName ?? 'tabKey';
   const tabKeyParams = routeParams.getAll(tabKeyParamName);
+
   function onTabChange(key: string) {
     // TODO make loading state
     // if this tab has href, then redirect to that href for changing tab
     const matchTabKey = props.tabs.find((tab) => tab.tabKey === key);
     if (matchTabKey) {
-      const pathWithParam = (matchTabKey as any)?.tabKey
+      const pathWithParam = matchTabKey?.tabKey
         ? createQueryString(
-            [{ name: tabKeyParamName, value: (matchTabKey as any)?.tabKey }],
+            [{ name: tabKeyParamName, value: matchTabKey?.tabKey }],
             routeParams,
           )
         : '';
@@ -80,28 +97,49 @@ export function OGTabsTable(props: OGTabsTableProps) {
   }, [tabKeyParams, routePathName, props.tabs]);
 
   return (
-    <div className="wrapper">
+    <div className="og-tabs-table-wrapper">
       <Tabs
         type="card"
         className="ant-tabs"
         activeKey={activeTabKey}
+        tabBarExtraContent={
+          <Space>
+            {props.filterForm && (
+              <OGDrawerTableFilter
+                formName={'filter-form'}
+                formMeta={props.filterForm}
+              />
+            )}
+            <Input.Search
+              placeholder="tìm kiếm"
+              allowClear
+              loading={false}
+              onSearch={(searchString) => alert(searchString)}
+              enterButton
+            />
+          </Space>
+        }
         onChange={onTabChange}
-        items={props.tabs.map((tab: any, i) => {
+        items={props.tabs.map((tab, i) => {
+          const key = tab.tabHref || tab.tabKey || tab.tabId || String(i + 1);
           return {
             label: tab.tabLabel,
-            key: tab.tabHref || tab.tabKey || String(i + 1),
+            key,
             children: (
-              <Table
+              <OGTableResource
+                key={key}
                 columns={tab.tableCol}
                 dataSource={tab.tableData}
-                pagination={false}
+                apiEndpoint="/product"
               />
             ),
           };
         })}
       />
-
-      <style jsx>{``}</style>
+      <style jsx global>{`
+        .og-tabs-table-wrapper {
+        }
+      `}</style>
     </div>
   );
 }

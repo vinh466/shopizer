@@ -62,6 +62,10 @@ export const SALES_PRODUCT_PAGE = {
     PATH: '/sales/product/list?type=sold-out',
     TITLE: 'Sales Product Sold Out',
   },
+  LIST_VIOLATE: {
+    PATH: '/sales/product/list?type=violate',
+    TITLE: 'Sales Product Violate',
+  },
   LIST_REVIEWING: {
     PATH: '/sales/product/list?type=reviewing',
     TITLE: 'Sales Product Reviewing',
