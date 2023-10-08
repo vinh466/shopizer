@@ -38,7 +38,6 @@ export function TDevProvider({ children }: { children: React.ReactNode }) {
     SALES_ORDER_PAGE,
     SALES_SHOP_PAGE,
   };
-  console.log(routes);
   Object.entries(routes).map(([key, values], index) => {
     return;
   });
