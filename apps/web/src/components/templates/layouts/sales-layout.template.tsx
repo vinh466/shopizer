@@ -9,9 +9,9 @@ import {
 } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  SALES_PAGE,
-  SALES_PRODUCT_PAGE,
-  SALES_SHOP_PAGE,
+  SELLER_PAGE,
+  SELLER_PRODUCT_PAGE,
+  SELLER_SHOP_PAGE,
 } from '@shopizer/constants';
 import { TContainer } from '@shopizer/templates';
 
@@ -46,9 +46,9 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
             selectedKeys={[pathName]}
             items={[
               {
-                key: SALES_PAGE.DASHBOARD.PATH,
+                key: SELLER_PAGE.DASHBOARD.PATH,
                 icon: <UserOutlined />,
-                onClick: () => router.push(SALES_PAGE.DASHBOARD.PATH),
+                onClick: () => router.push(SELLER_PAGE.DASHBOARD.PATH),
                 label: 'Dashboard',
               },
               {
@@ -57,15 +57,15 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                 label: 'Product',
                 children: [
                   {
-                    key: SALES_PRODUCT_PAGE.LIST.PATH,
+                    key: SELLER_PRODUCT_PAGE.LIST.PATH,
                     icon: <UserOutlined />,
-                    onClick: () => router.push(SALES_PRODUCT_PAGE.LIST.PATH),
+                    onClick: () => router.push(SELLER_PRODUCT_PAGE.LIST.PATH),
                     label: 'List',
                   },
                   {
-                    key: SALES_PRODUCT_PAGE.ADD.PATH,
+                    key: SELLER_PRODUCT_PAGE.ADD.PATH,
                     icon: <UserOutlined />,
-                    onClick: () => router.push(SALES_PRODUCT_PAGE.ADD.PATH),
+                    onClick: () => router.push(SELLER_PRODUCT_PAGE.ADD.PATH),
                     label: 'Add',
                   },
                 ],
@@ -76,15 +76,15 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                 label: 'Shop',
                 children: [
                   {
-                    key: SALES_SHOP_PAGE.PROFILE.PATH,
+                    key: SELLER_SHOP_PAGE.PROFILE.PATH,
                     icon: <UserOutlined />,
-                    onClick: () => router.push(SALES_SHOP_PAGE.PROFILE.PATH),
+                    onClick: () => router.push(SELLER_SHOP_PAGE.PROFILE.PATH),
                     label: 'Profile',
                   },
                   {
-                    key: SALES_SHOP_PAGE.RATING.PATH,
+                    key: SELLER_SHOP_PAGE.RATING.PATH,
                     icon: <UserOutlined />,
-                    onClick: () => router.push(SALES_SHOP_PAGE.RATING.PATH),
+                    onClick: () => router.push(SELLER_SHOP_PAGE.RATING.PATH),
                     label: 'Rating',
                   },
                 ],

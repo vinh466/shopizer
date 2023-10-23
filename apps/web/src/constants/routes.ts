@@ -8,12 +8,12 @@ export const COMMON_PAGE = {
     TITLE: 'Cart',
   },
   SIGN_IN: {
-    PATH: '/sign-in',
+    PATH: '/auth/buyer/sign-in',
     TITLE: 'Sign In',
   },
-  SIGN_OUT: {
-    PATH: '/sign-out',
-    TITLE: 'Sign Out',
+  SIGN_UP: {
+    PATH: '/auth/buyer/sign-up',
+    TITLE: 'Sign Up',
   },
 };
 
@@ -43,80 +43,80 @@ export const USER_PAGE = {
     TITLE: 'User Voucher',
   },
 };
-export const SALES_PAGE = {
+export const SELLER_PAGE = {
   DASHBOARD: {
-    PATH: '/sales',
-    TITLE: 'Sales Dashboard',
+    PATH: '/Seller',
+    TITLE: 'Seller Dashboard',
   },
 };
-export const SALES_PRODUCT_PAGE = {
+export const SELLER_PRODUCT_PAGE = {
   LIST: {
-    PATH: '/sales/product/list',
-    TITLE: 'Sales Product All',
+    PATH: '/seller/product/list',
+    TITLE: 'Seller Product All',
   },
   LIST_ACTIVE: {
-    PATH: '/sales/product/list?type=active',
-    TITLE: 'Sales Product Active',
+    PATH: '/seller/product/list?type=active',
+    TITLE: 'Seller Product Active',
   },
   LIST_SOLD_OUT: {
-    PATH: '/sales/product/list?type=sold-out',
-    TITLE: 'Sales Product Sold Out',
+    PATH: '/seller/product/list?type=sold-out',
+    TITLE: 'Seller Product Sold Out',
   },
   LIST_VIOLATE: {
-    PATH: '/sales/product/list?type=violate',
-    TITLE: 'Sales Product Violate',
+    PATH: '/seller/product/list?type=violate',
+    TITLE: 'Seller Product Violate',
   },
   LIST_REVIEWING: {
-    PATH: '/sales/product/list?type=reviewing',
-    TITLE: 'Sales Product Reviewing',
+    PATH: '/seller/product/list?type=reviewing',
+    TITLE: 'Seller Product Reviewing',
   },
   LIST_UNLISTED: {
-    PATH: '/sales/product/list?type=unlisted',
-    TITLE: 'Sales Product Unlisted',
+    PATH: '/seller/product/list?type=unlisted',
+    TITLE: 'Seller Product Unlisted',
   },
   ADD: {
-    PATH: '/sales/product/add',
-    TITLE: 'Sales Product Add',
+    PATH: '/seller/product/add',
+    TITLE: 'Seller Product Add',
   },
 };
 
-export const SALES_ORDER_PAGE = {
+export const SELLER_ORDER_PAGE = {
   LIST: {
-    PATH: '/sales/order',
-    TITLE: 'Sales Order',
+    PATH: '/seller/order',
+    TITLE: 'Seller Order',
   },
   LIST_UNPAID: {
-    PATH: '/sales/order?type=unpaid',
-    TITLE: 'Sales Order (unpaid)',
+    PATH: '/seller/order?type=unpaid',
+    TITLE: 'Seller Order (unpaid)',
   },
   LIST_TOSHIP: {
-    PATH: '/sales/order?type=toship',
-    TITLE: 'Sales Order (toship)',
+    PATH: '/seller/order?type=toship',
+    TITLE: 'Seller Order (toship)',
   },
   LIST_SHIPPING: {
-    PATH: '/sales/order?type=shipping',
-    TITLE: 'Sales Order (shipping)',
+    PATH: '/seller/order?type=shipping',
+    TITLE: 'Seller Order (shipping)',
   },
   LIST_COMPLETED: {
-    PATH: '/sales/order?type=completed',
-    TITLE: 'Sales Order (completed)',
+    PATH: '/seller/order?type=completed',
+    TITLE: 'Seller Order (completed)',
   },
   LIST_CANCELLED: {
-    PATH: '/sales/order?type=cancelled',
-    TITLE: 'Sales Order (cancelled)',
+    PATH: '/seller/order?type=cancelled',
+    TITLE: 'Seller Order (cancelled)',
   },
   LIST_RETURN_LIST: {
-    PATH: '/sales/order?type=return-list',
-    TITLE: 'Sales Order (return-list)',
+    PATH: '/seller/order?type=return-list',
+    TITLE: 'Seller Order (return-list)',
   },
 };
-export const SALES_SHOP_PAGE = {
+export const SELLER_SHOP_PAGE = {
   PROFILE: {
-    PATH: '/sales/shop/profile',
-    TITLE: 'Sales Shop Profile',
+    PATH: '/seller/shop/profile',
+    TITLE: 'Seller Shop Profile',
   },
   RATING: {
-    PATH: '/sales/shop/rating',
-    TITLE: 'Sales Shop Rating',
+    PATH: '/seller/shop/rating',
+    TITLE: 'Seller Shop Rating',
   },
 };

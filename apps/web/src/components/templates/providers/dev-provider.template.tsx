@@ -20,9 +20,9 @@ import {
 import Link from 'next/link';
 import {
   COMMON_PAGE,
-  SALES_ORDER_PAGE,
-  SALES_PRODUCT_PAGE,
-  SALES_SHOP_PAGE,
+  SELLER_ORDER_PAGE,
+  SELLER_PRODUCT_PAGE,
+  SELLER_SHOP_PAGE,
   USER_PAGE,
 } from '@shopizer/constants';
 import { useRecoilState } from 'recoil';
@@ -33,10 +33,10 @@ export function TDevProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useRecoilState(themeState);
   const routes = {
     COMMON_PAGE,
-    SALES_PRODUCT_PAGE,
+    SELLER_PRODUCT_PAGE,
     USER_PAGE,
-    SALES_ORDER_PAGE,
-    SALES_SHOP_PAGE,
+    SELLER_ORDER_PAGE,
+    SELLER_SHOP_PAGE,
   };
   Object.entries(routes).map(([key, values], index) => {
     return;
