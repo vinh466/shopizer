@@ -97,7 +97,7 @@ const violateProductTable = [
 
 export const saleProductTabTable: TabTable = [
   {
-    tabHref: '/sales/product/list',
+    tabHref: '/seller/product/list',
     tabLabel: 'Tất cả',
     tableData: [],
     tableCol: productTable,

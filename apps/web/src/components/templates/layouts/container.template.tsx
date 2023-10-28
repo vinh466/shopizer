@@ -14,7 +14,6 @@ export function TContainer({ children }: TContainerProps) {
         width: 'var(--max-width)',
         padding: '0 15px',
         margin: '0 auto',
-        overflowX: 'hidden',
       }}
     >
       {children}

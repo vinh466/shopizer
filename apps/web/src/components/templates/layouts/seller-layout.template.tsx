@@ -14,6 +14,8 @@ import {
   SELLER_SHOP_PAGE,
 } from '@shopizer/constants';
 import { TContainer } from '@shopizer/templates';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const { Content, Header, Sider } = Layout;
 
@@ -35,12 +37,32 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
         >
           <div
             style={{
-              height: '32px',
-              margin: '16px',
-              background: 'rgba(255,255,255,.2)',
-              borderRadius: '6px',
+              height: '64px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            {collapsed ? (
+              <Image
+                loading="eager"
+                src={'/shopizer-logo-icon.png'}
+                height={32}
+                width={32}
+                alt="logo"
+              ></Image>
+            ) : (
+              <Link href="/">
+                <Image
+                  loading="eager"
+                  src={'/shopizer-logo@0.5x.png'}
+                  height={28}
+                  width={170}
+                  alt="logo"
+                ></Image>
+              </Link>
+            )}
+          </div>
           <Menu
             mode="inline"
             selectedKeys={[pathName]}
@@ -105,7 +127,7 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                 height: 64,
               }}
             />
-            Dashboard / Product
+            {/* Dashboard / Product */}
           </Header>
           <Content
             style={{

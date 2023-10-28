@@ -14,13 +14,25 @@
 html,
 body {
   margin: 0;
+  background-color: #f5f5f5;
 }
 
 body {
 }
 
-a { 
+a {
   text-decoration: none;
+}
+.sticky-scroll-bar {
+  overflow-y: scroll;
+  height: calc(100vh - 16px);
+}
+.sticky-scroll-bar::-webkit-scrollbar {
+  display: none;
+}
+.ant-input-number .ant-input-number-handler-up-disabled,
+.ant-input-number .ant-input-number-handler-down-disabled {
+  cursor: none;
 }
 
 @media (prefers-color-scheme: dark) {

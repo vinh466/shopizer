@@ -45,7 +45,7 @@ export const USER_PAGE = {
 };
 export const SELLER_PAGE = {
   DASHBOARD: {
-    PATH: '/Seller',
+    PATH: '/seller',
     TITLE: 'Seller Dashboard',
   },
 };

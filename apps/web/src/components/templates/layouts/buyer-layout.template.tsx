@@ -10,6 +10,7 @@ const { Content } = Layout;
 const contentStyle: React.CSSProperties = {
   minHeight: 120,
   minWidth: 'var(--max-width)',
+  marginTop: 16,
 };
 
 export function TMainLayout({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,7 @@ export function TMainLayout({ children }: { children: React.ReactNode }) {
       <Content style={contentStyle}>
         <TContainer>{children}</TContainer>
       </Content>
-      <OGMainLayoutFooter />
+      {/* <OGMainLayoutFooter /> */}
     </Layout>
   );
 }
