@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
 import {
+  IsArray,
   IsDate,
   IsInt,
   IsNotEmpty,
@@ -8,6 +9,10 @@ import {
   ValidateNested,
 } from "class-validator";
 
+class Test {
+  @IsString()
+  public name: string;
+}
 class BatchDto {
   @IsDate()
   @Type(() => Date)
@@ -35,6 +40,12 @@ class CreateProductDto {
   @Type(() => BatchDto)
   @ValidateNested()
   public batches: BatchDto;
+
+  @IsNotEmpty()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Test)
+  public attributes: Test[];
 }
 
 export default CreateProductDto;

@@ -1,12 +1,13 @@
 import * as bcrypt from "bcrypt";
 import { Request, Response, NextFunction } from "express";
 import AuthenticationService from "./authentication.service";
-import LogInDto from "./dto/logIn.dto";
-import validationMiddleware from "@shopizer/middleware/validation.middleware";
 import WrongCredentialsException from "./exceptions/WrongCredentialsException";
 import CreateUserDto from "../user/dto/user.dto";
 import UserService from "../user/user.service";
 import { Controller, Post } from "@shopizer/decorators";
+import { DtoValidation } from "@shopizer/middleware";
+import SignInDto from "./dto/sign-in.dto";
+import { set } from "lodash";
 
 @Controller("auth")
 class AuthenticationController {
@@ -15,7 +16,7 @@ class AuthenticationController {
 
   constructor() {}
 
-  @Post("register", validationMiddleware(LogInDto))
+  @Post("sign-up", DtoValidation(CreateUserDto))
   async registration(request: Request, response: Response, next: NextFunction) {
     const userData: CreateUserDto = request.body;
     try {
@@ -28,9 +29,9 @@ class AuthenticationController {
     }
   }
 
-  @Post("login", validationMiddleware(LogInDto))
+  @Post("sign-in", DtoValidation(SignInDto))
   async loggingIn(request: Request, response: Response, next: NextFunction) {
-    const logInData: LogInDto = request.body;
+    const logInData: SignInDto = request.body;
     const user = await this.userService.findOne({ email: logInData.email });
     if (user) {
       const isPasswordMatching = await bcrypt.compare(
@@ -39,7 +40,9 @@ class AuthenticationController {
       );
       if (isPasswordMatching) {
         const tokenData = this.authenticationService.createToken(user);
-        response.json({ user, accessToken: tokenData.token });
+        setTimeout(() => {
+          response.json({ user, accessToken: tokenData.token });
+        }, 2000);
       } else {
         next(new WrongCredentialsException());
       }
@@ -48,7 +51,7 @@ class AuthenticationController {
     }
   }
 
-  @Post("logout")
+  @Post("sign-out")
   loggingOut(request: Request, response: Response) {
     return response.status(200).json({ message: "Logout successful" });
   }

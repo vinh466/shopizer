@@ -33,7 +33,7 @@ function getDTOValidationErrors(
   return result;
 }
 
-function validationMiddleware<T>(
+export function DtoValidation<T>(
   type: any,
   skipMissingProperties = false
 ): RequestHandler {
@@ -43,7 +43,7 @@ function validationMiddleware<T>(
         console.log(errors);
         if (errors.length > 0) {
           next(
-            new HttpException(400, "message", getDTOValidationErrors(errors))
+            new HttpException(500, "Wrong Dto", getDTOValidationErrors(errors))
           );
         } else {
           next();
@@ -52,5 +52,3 @@ function validationMiddleware<T>(
     );
   };
 }
-
-export default validationMiddleware;

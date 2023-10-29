@@ -7,6 +7,8 @@ import { prisma } from "@shopizer/helpers/prisma.helper";
 import * as morgan from "morgan";
 import "reflect-metadata";
 import * as path from "path";
+import * as cors from "cors";
+
 import {
   CONTROLLER_KEY,
   METHOD_KEY,
@@ -35,10 +37,16 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(
+      cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+      })
+    );
     this.app.use(bodyParser.json());
+    this.app.use(express.static("public"));
     this.app.use(cookieParser());
     this.app.use(morgan("dev"));
-    this.app.use(errorMiddleware);
   }
 
   private initializeControllers(controllers: any[]) {
@@ -74,8 +82,9 @@ class App {
         }
       });
 
-      console.log(`Module [${prefix}] is loaded`);
+      console.log(`Module [${instance.constructor.name}] is loaded`);
     }
+    this.app.use(errorMiddleware);
   }
 
   private async connectToTheDatabase() {

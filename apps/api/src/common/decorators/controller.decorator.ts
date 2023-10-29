@@ -8,7 +8,7 @@ export const Controller = (
   prefix = "",
   ...middlewares: RequestHandler[]
 ): ClassDecorator => {
-  return (target: any) => {
+  return (target: any, ...log) => {
     Reflect.defineMetadata(CONTROLLER_KEY, prefix, target);
 
     if (!Reflect.hasMetadata(METHOD_KEY, target)) {
