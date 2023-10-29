@@ -9,14 +9,30 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/node": "20.5.1",
-    "@types/react": "18.2.20",
-    "@types/react-dom": "18.2.7",
+    "@ant-design/cssinjs": "^1.17.0",
+    "antd": "^5.9.1",
+    "axios": "^1.5.0",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
+    "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
     "next": "13.4.19",
+    "pubsub-js": "^1.9.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use": "^17.4.0",
+    "recoil": "^0.7.7",
+    "recoil-persist": "^5.1.0",
+    "styled-components": "^6.0.8",
+    "swr": "^2.2.4",
     "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.4",
+    "@types/lodash": "^4.14.199",
+    "@types/node": "^20.7.0",
+    "@types/pubsub-js": "^1.8.4",
+    "@types/react": "^18.2.23",
+    "@types/react-dom": "^18.2.8"
   }
 }
