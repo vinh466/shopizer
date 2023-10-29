@@ -1,51 +1,31 @@
 import { Request, Response, NextFunction, Router } from "express";
-import Controller from "@shopizer/types/controller.interface";
 import authMiddleware from "@shopizer/middleware/auth.middleware";
-import validationMiddleware from "@shopizer/middleware/validation.middleware";
 import ProductNotFoundException from "./exceptions/ProductNotFoundException";
 import RequestWithUser from "@shopizer/types/requestWithUser.interface";
 import ProductService from "./product.service";
 import CreateProductDto from "./dto/createProduct.dto";
 import UpdateProductDto from "./dto/updateProduct.dto";
+import { Controller, Delete, Get, Patch, Post } from "@shopizer/decorators";
+import { DtoValidation } from "@shopizer/middleware";
+import { PrismaClient } from "@prisma/client";
+import { FileUploadMiddleware } from "@shopizer/middleware/file-update.middleware";
+import { MulterError } from "multer";
 
-class ProductController implements Controller {
-  public path = "/product";
-  public router = Router();
+@Controller("product")
+class ProductController {
   private productService = new ProductService();
 
-  constructor() {
-    this.initializeRoutes();
-  }
+  prisma = new PrismaClient();
 
-  private initializeRoutes() {
-    this.router.get(this.path, this.getAll);
-    this.router.get(`${this.path}/:id`, this.getById);
-    this.router
-      .all(`${this.path}/*`, authMiddleware)
-      .patch(
-        `${this.path}/:id`,
-        validationMiddleware(CreateProductDto),
-        this.modify
-      )
-      .delete(`${this.path}/:id`, this.delete)
-      .post(
-        this.path,
-        authMiddleware,
-        validationMiddleware(CreateProductDto),
-        this.create
-      );
-  }
+  constructor() {}
 
-  private getAll = async (request: Request, response: Response) => {
+  @Get("/list")
+  async getProduct(request: Request, response: Response) {
     const product = await this.productService.find();
-    response.send(product);
-  };
-
-  private getById = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) => {
+    response.json(product);
+  }
+  @Get("/:id")
+  async getById(request: Request, response: Response, next: NextFunction) {
     const id = request.params.id;
     const product = await this.productService.findById(id);
     if (product) {
@@ -53,13 +33,9 @@ class ProductController implements Controller {
     } else {
       next(new ProductNotFoundException(id));
     }
-  };
-
-  private modify = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) => {
+  }
+  @Patch("/:id", authMiddleware, DtoValidation(UpdateProductDto))
+  async modify(request: Request, response: Response, next: NextFunction) {
     const id = request.params.id;
     const productData: UpdateProductDto = request.body;
     const product = await this.productService.findByIdAndUpdate(
@@ -71,19 +47,15 @@ class ProductController implements Controller {
     } else {
       next(new ProductNotFoundException(id));
     }
-  };
-
-  private create = async (request: RequestWithUser, response: Response) => {
+  }
+  @Post("/", authMiddleware, DtoValidation(CreateProductDto))
+  async create(request: RequestWithUser, response: Response) {
     const productData: CreateProductDto = request.body;
     const createdProduct = await this.productService.create(productData);
     response.json(createdProduct);
-  };
-
-  private delete = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) => {
+  }
+  @Delete("/:id", authMiddleware)
+  async delete(request: Request, response: Response, next: NextFunction) {
     const id = request.params.id;
     const successResponse = await this.productService.findByIdAndDelete(id);
     if (successResponse) {
@@ -91,7 +63,29 @@ class ProductController implements Controller {
     } else {
       next(new ProductNotFoundException(id));
     }
-  };
+  }
+
+  @Post(
+    "/update-image",
+    authMiddleware,
+    FileUploadMiddleware({
+      fields: [{ name: "product", maxCount: 1 }],
+      dest: "images/products",
+    })
+  )
+  async updateImage(request: Request, response: Response) {
+    const file = request.files?.["product"]?.[0];
+    if (file === undefined) {
+      return response.status(400).json({
+        error: true,
+        message: "Tải file không thành công xin hãy thử lại!",
+      });
+    }
+    return response.status(200).json({
+      success: true,
+      file,
+    });
+  }
 }
 
 export default ProductController;

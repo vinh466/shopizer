@@ -12,5 +12,8 @@
   "scripts": {},
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.3"
+  }
 }

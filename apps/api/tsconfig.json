@@ -5,7 +5,7 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "alwaysStrict": true,
-    "noImplicitAny": true,
+    // "noImplicitAny": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

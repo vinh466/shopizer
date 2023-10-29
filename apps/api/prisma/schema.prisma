@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(uuid())
+    id        String   @id @default(value: uuid())
     email     String   @unique
     password  String
     firstName String?
@@ -17,10 +17,10 @@ model User {
     phone     String?
     createdAt DateTime @default(now())
 
-    orders              Order[]
-    Auction             Auction[]
-    Address             Address[]
-    PaymentMethodDetail PaymentMethodDetail[]
+    orders               Order[]
+    auctions             Auction[]
+    addresses            Address[]
+    paymentMethodDetails PaymentMethodDetail[]
 }
 
 model Store {
@@ -53,8 +53,14 @@ model Product {
 model Category {
     id          String  @id @default(uuid())
     name        String
+    displayName String
+    isProhibit  Boolean @default(false)
     description String?
+    image       String?
 
+    parentId String?
+    parent   Category?  @relation("ChildCategory", fields: [parentId], references: [id])
+    children Category[] @relation("ChildCategory")
     products Product[]
 }
 

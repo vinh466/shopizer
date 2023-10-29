@@ -16,7 +16,9 @@ class AuthenticationService {
     }
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = await this.user.create({
-      ...userData,
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
       password: hashedPassword,
     });
     const tokenData = this.createToken(user);

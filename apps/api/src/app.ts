@@ -1,25 +1,32 @@
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
 import * as express from "express";
-import Controller from "@shopizer/types/controller.interface";
+import { RouteDefinition } from "@shopizer/types/controller.interface";
 import errorMiddleware from "@shopizer/middleware/error.middleware";
 import { prisma } from "@shopizer/helpers/prisma.helper";
-import * as session from "express-session";
 import * as morgan from "morgan";
 import "reflect-metadata";
+import * as path from "path";
+import * as cors from "cors";
+
+import {
+  CONTROLLER_KEY,
+  METHOD_KEY,
+  MIDDLEWARE_KEY,
+} from "@shopizer/decorators";
 class App {
   public app: express.Application;
 
-  constructor(controllers: Controller[]) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  constructor(controllers: Function[]) {
     this.app = express();
 
-    this.connectToTheDatabase();
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
-    this.initializeErrorHandling();
   }
 
-  public listen() {
+  public async listen() {
+    await this.connectToTheDatabase();
     this.app.listen(process.env.PORT, () => {
       console.log(`App listening on the port ${process.env.PORT}`);
     });
@@ -30,32 +37,60 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this.app.use(
+      cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+      })
+    );
     this.app.use(bodyParser.json());
+    this.app.use(express.static("public"));
     this.app.use(cookieParser());
-    // this.app.use(
-    //   session({
-    //     secret: "secret",
-    //     resave: true,
-    //     saveUninitialized: true,
-    //   })
-    // );
     this.app.use(morgan("dev"));
   }
 
-  private initializeErrorHandling() {
-    this.app.use(errorMiddleware);
-  }
+  private initializeControllers(controllers: any[]) {
+    for (const controller of controllers) {
+      const instance = new controller();
+      const prefix = Reflect.getMetadata(CONTROLLER_KEY, controller);
+      const routes: RouteDefinition[] = Reflect.getMetadata(
+        METHOD_KEY,
+        controller
+      );
+      const middlewares: any[] = Reflect.getMetadata(
+        MIDDLEWARE_KEY,
+        controller
+      );
+      routes?.forEach((route) => {
+        if (prefix && route.path) {
+          const routePath = path
+            .join("/", prefix, route.path)
+            .replace(/\\/g, "/");
 
-  private initializeControllers(controllers: Controller[]) {
-    controllers.forEach((controller) => {
-      this.app.use("/", controller.router);
-    });
+          const handler = (
+            req: Request,
+            res: Response,
+            next: express.NextFunction
+          ) => instance[route.methodName](req, res, next);
+
+          this.app[route.requestMethod](
+            routePath,
+            ...middlewares,
+            ...route.middlewares,
+            handler as any
+          );
+        }
+      });
+
+      console.log(`Module [${instance.constructor.name}] is loaded`);
+    }
+    this.app.use(errorMiddleware);
   }
 
   private async connectToTheDatabase() {
     try {
       await prisma.$connect();
-      console.log(`Connected to database`);
+      console.log(`\nDatabase is Connected`);
     } catch (error) {
       console.error(`Error connecting to database: ${error.message}`);
     } finally {
