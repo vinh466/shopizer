@@ -4,12 +4,13 @@ import AuthenticationTokenMissingException from "../../modules/authentication/ex
 import RequestWithUser from "../types/requestWithUser.interface";
 import DataStoredInToken from "../types/dataStoredInToken";
 import WrongAuthenticationTokenException from "@shopizer/modules/authentication/exceptions/WrongAuthenticationTokenException";
+import UserService from "@shopizer/modules/user/user.service";
 
 async function authMiddleware(
   request: RequestWithUser,
   response: Response,
   next: NextFunction
-) {
+) {  
   const headers = request.headers;
   if (headers && headers.authorization) {
     const secret = process.env.JWT_SECRET;
@@ -17,20 +18,19 @@ async function authMiddleware(
       const verificationResponse = jwt.verify(
         headers.authorization.replace("Bearer ", ""),
         secret
-      ) as DataStoredInToken;
-      const id = verificationResponse.id;
-      const user: any = {};
+      ) as any // as DataStoredInToken; 
+      const user = verificationResponse 
       if (user) {
         request.user = user;
-        next();
+        return next();
       } else {
-        next(new WrongAuthenticationTokenException());
+        return next(new WrongAuthenticationTokenException());
       }
     } catch (error) {
-      next(new WrongAuthenticationTokenException());
+      return next(new WrongAuthenticationTokenException());
     }
   } else {
-    next(new AuthenticationTokenMissingException());
+    return next(new AuthenticationTokenMissingException());
   }
 }
 

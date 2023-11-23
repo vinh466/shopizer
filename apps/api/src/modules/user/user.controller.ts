@@ -4,40 +4,44 @@ import { Router, Request, Response, NextFunction } from "express";
 import UserNotFoundException from "./exceptions/UserNotFoundException";
 import NotAuthorizedException from "./exceptions/NotAuthorizedException";
 import { Controller, Get } from "@shopizer/decorators";
+import UserService from "./user.service";
 
 @Controller("user")
 class UserController {
-  private post = {} as any;
-  private user = {} as any;
+  userServices = new UserService();
 
   constructor() {}
 
-  @Get("/:id", authMiddleware)
+  @Get("/profile", authMiddleware)
   async getUserById(request: Request, response: Response, next: NextFunction) {
-    const id = request.params.id;
-    const userQuery = this.user.findById(id);
-    if (request.query.withPosts === "true") {
-      userQuery.populate("posts").exec();
-    }
-    const user = await userQuery;
-    if (user) {
-      response.send(user);
-    } else {
-      next(new UserNotFoundException(id));
+    try {
+      const id = request.user.id;
+      const user = await this.userServices.findById(id);
+
+      if (user) {
+        response.send(user);
+      } else {
+        next(new UserNotFoundException(id));
+      }
+    } catch (error) {
+      next(error);
     }
   }
-  @Get("/:id/posts", authMiddleware)
-  async getAllPostsOfUser(
-    request: RequestWithUser,
-    response: Response,
-    next: NextFunction
-  ) {
-    const userId = request.params.id;
-    if (userId === request.user.id.toString()) {
-      const posts = await this.post.find({ author: userId });
-      response.send(posts);
-    }
-    next(new NotAuthorizedException());
+
+  @Get("/seller/profile", authMiddleware)
+  async getSellerById(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = request.user.id;
+      const user = await this.userServices.findSellerById(id);
+
+      if (user) {
+        response.send(user);
+      } else {
+        next(new UserNotFoundException(id));
+      }
+    } catch (error) {
+      next(error);
+    } 
   }
 }
 
