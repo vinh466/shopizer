@@ -10,3 +10,5 @@ export * from './product/product.organism';
 
 export * from './buyer/home/category/home-category.organism';
 export * from './buyer/home/product/home-product.organism';
+
+export * from './seller/verify/seller-verify.organism'

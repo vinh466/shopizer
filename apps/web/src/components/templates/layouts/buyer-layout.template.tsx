@@ -9,7 +9,6 @@ const { Content } = Layout;
 
 const contentStyle: React.CSSProperties = {
   minHeight: 120,
-  minWidth: 'var(--max-width)',
   marginTop: 16,
 };
 

@@ -25,7 +25,8 @@ interface TabTableData<TableRecordType = any> {
   tabHref: string;
   tabLabel: string;
   tableCol: ColumnsType<TableRecordType>;
-  tableData: readonly TableRecordType[];
+  apiEndpoint?: string;
+  baseQuery?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ interface OGTabsTableProps {
    */
   tabKeyParamName?: string;
   filterForm?: FormMeta;
+  searchable?: boolean;
 }
 
 export function OGTabsTable(props: OGTabsTableProps) {
@@ -110,18 +112,21 @@ export function OGTabsTable(props: OGTabsTableProps) {
                 formMeta={props.filterForm}
               />
             )}
-            <Input.Search
-              placeholder="tìm kiếm"
-              allowClear
-              loading={false}
-              onSearch={(searchString) => alert(searchString)}
-              enterButton
-            />
+            {props.searchable && (
+              <Input.Search
+                placeholder="tìm kiếm"
+                allowClear
+                loading={false}
+                onSearch={(searchString) => alert(searchString)}
+                enterButton
+              />
+            )}
           </Space>
         }
         onChange={onTabChange}
         items={props.tabs.map((tab, i) => {
-          const key = tab.tabHref || tab.tabKey || tab.tabId || String(i + 1);
+          let key = tab.tabHref || tab.tabKey || tab.tabId || String(i + 1);
+          // key += String(i + 1);
           return {
             label: tab.tabLabel,
             key,
@@ -129,8 +134,8 @@ export function OGTabsTable(props: OGTabsTableProps) {
               <OGTableResource
                 key={key}
                 columns={tab.tableCol}
-                dataSource={tab.tableData}
-                apiEndpoint="/product"
+                apiEndpoint={tab.apiEndpoint}
+                baseQuery={tab.baseQuery || ''}
               />
             ),
           };

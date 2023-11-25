@@ -12,6 +12,8 @@ import {
 import Image from 'next/image';
 import { useState } from 'react';
 import { MLCartTable } from '@shopizer/molecules';
+import Link from 'next/link';
+import { COMMON_PAGE } from '@shopizer/constants';
 
 export default function CartPage() {
   const [cart, setCart] = useRecoilState(cartState);
@@ -97,9 +99,9 @@ export default function CartPage() {
             title="Giỏ hàng trống"
             subTitle="Bạn hãy tìm thêm các sản phẩm nhé!"
             extra={[
-              <Button key="console" href="/">
-                Xem sản phẩm
-              </Button>,
+              <Link key="home" href={COMMON_PAGE.HOME.PATH}>
+                <Button>Xem sản phẩm</Button>
+              </Link>,
             ]}
             style={{
               background: '#fff',

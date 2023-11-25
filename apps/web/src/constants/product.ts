@@ -1,0 +1,6 @@
+export const PRODUCT_STATUS = {
+    ACTIVE: "ACTIVE",
+    SOLD_OUT: "SOLD_OUT",
+    VIOLATE: "VIOLATE",
+    UNLISTED: "UNLISTED",
+}

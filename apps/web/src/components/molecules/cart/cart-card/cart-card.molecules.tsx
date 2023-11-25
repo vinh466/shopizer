@@ -1,52 +1,75 @@
-import { cartState } from '@shopizer/stores';
+import { BACKEND_PRODUCT_IMAGE_PATH, COMMON_PAGE } from '@shopizer/constants';
+import { cartState, sessionState } from '@shopizer/stores';
 import { Button, Card, Col, InputNumber, Rate, Row, Space } from 'antd';
 import { set } from 'lodash';
 import Image from 'next/image';
-import React from 'react';
+import Link from 'next/link';
+import React, { use, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 
 interface MCartCardProps {
   loading?: boolean;
   product?: any;
+  basePrice: any;
 }
 
 export function MCartCard(props: MCartCardProps) {
   const [cart, setCart] = useRecoilState(cartState);
+  const [session, setSession] = useRecoilState(sessionState);
   const [quantity, setQuantity] = React.useState(1);
-  const price = 1000000 * quantity;
+  const [productVariant, setProductVariant] = React.useState<any>(null);
   const handleAddToCart = () => {
-    setCart({
+    const newCart = {
       ...cart,
-      items: [
-        {
-          id: 1,
-          quantity: quantity,
-          price: 1000000,
-          product: {
-            id: 1,
-            name: 'Máy tăm nước cầm tay Panasonic công nghệ siêu âm EW1511 - Hàng Chính Hãng - Trắng',
-            price: 1000000,
-            image:
-              'https://salt.tikicdn.com/cache/280x280/ts/product/de/4c/53/dfbb282fbcc1e16a033e3fcc4d99fa32.jpg.webp',
-          },
-        },
-      ],
-    });
+      items: [...(cart.items || [])],
+    };
+    const cardItems = [...(cart.items || [])];
+
+    console.log(props.product);
+    console.log(cardItems);
+    const seller = props.product.Seller;
+    const cardItemindex = cardItems.findIndex(
+      (item: any) => props.product.seller?.id === seller.id,
+    );
+
+    console.log({cardItemindex});
+
+
+    console.log(productVariant, cart);
+    newCart.items.push(productVariant);
+    console.log(cart);
+    console.log(newCart);
+    setCart(newCart);
   };
   const onChange = (value: any) => {
     setQuantity(value);
   };
+  useEffect(() => {
+    console.log(props.basePrice);
+    console.log(props.product);
+    const productVariant = props.product?.ProductVariant?.find(
+      (item: any) => item.id === props.basePrice.id,
+    );
+    console.log(productVariant);
+    setProductVariant(productVariant);
+  }, [props.basePrice]);
   return (
     <div className="cart-card">
       <div className="product-type">
-        <Image
+        {/* <Image
           loading="lazy"
           alt="example"
-          src="https://salt.tikicdn.com/cache/280x280/ts/product/de/4c/53/dfbb282fbcc1e16a033e3fcc4d99fa32.jpg.webp"
+          src={BACKEND_PRODUCT_IMAGE_PATH + props.product?.image}
           width={'40'}
           height={'40'}
-        />
-        <span>Màu Đen</span>{' '}
+        /> */}
+        <h5>
+          {!!productVariant?.variationName
+            ? productVariant?.variationName === 'default'
+              ? ''
+              : productVariant?.variationName
+            : 'Hãy chọn Loại'}
+        </h5>
       </div>
       <div className="product-amount">
         <div className="title">Số Lượng</div>
@@ -61,7 +84,7 @@ export function MCartCard(props: MCartCardProps) {
       <div className="product-price">
         <div className="title">Tạm Tính</div>
         <div>
-          {price?.toLocaleString('vi-VN', {
+          {((productVariant?.price || 0) * quantity)?.toLocaleString('vi-VN', {
             style: 'currency',
             currency: 'VND',
           })}
@@ -69,9 +92,15 @@ export function MCartCard(props: MCartCardProps) {
       </div>
       <div className="cart-action">
         <div>
-          <Button style={{ width: '100%' }} href="/cart">
-            Mua Ngay
-          </Button>
+          <Link
+            href={
+              session.isAuthenticated
+                ? COMMON_PAGE.CART.PATH
+                : COMMON_PAGE.SIGN_IN.PATH
+            }
+          >
+            <Button style={{ width: '100%' }}>Mua Ngay</Button>
+          </Link>
         </div>
         <div style={{ margin: '8px 0' }}>
           <Button style={{ width: '100%' }} onClick={handleAddToCart}>

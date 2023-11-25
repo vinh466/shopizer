@@ -63,7 +63,7 @@ export function MLCartTable() {
           </div>
         </Col>
       </Row>
-      {[1, 2].map((item, index) => (
+      {[1].map((item, index) => (
         <Row gutter={[0, 16]} className="list-content" key={index}>
           <Col>
             <span>
@@ -73,32 +73,32 @@ export function MLCartTable() {
                 checked={checkAll}
                 style={{ marginRight: 10 }}
               />
-              Shop name
+              Vinh Shop
             </span>
           </Col>
           <Col span="24">
-            {Array.from({ length: 1 }, () => cart?.items[0])?.map(
+            {Array.from({ length: 0 }, () => cart?.items[0])?.map(
               (item: any, index: number) => (
                 <div className="grid-table" key={index}>
                   <div className="product-info">
                     <Checkbox
-                      indeterminate={indeterminate}
+                      // indeterminate={indeterminate}
                       onChange={onCheckAllChange}
                       checked={checkAll}
                       style={{ marginRight: 10 }}
                     />
                     <Image
-                      src={item.product.image}
+                      src={item?.product?.image}
                       alt=""
                       width={80}
                       height={80}
                     />
                     <div className="product-name">
                       <Link
-                        href={`/product/${item.product.id}`}
-                        title={item.product.name}
+                        href={`/product/${item?.product.id}`}
+                        title={item?.product.name}
                       >
-                        {item.product.name}
+                        {item?.product.name}
                       </Link>
                     </div>
                   </div>

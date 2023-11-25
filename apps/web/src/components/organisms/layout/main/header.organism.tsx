@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { useRecoilState } from 'recoil';
 import { cartState, sessionState } from '@shopizer/stores';
 import { useRouter } from 'next/navigation';
+import { COMMON_PAGE } from '@shopizer/constants';
 
 const { Header } = Layout;
 
@@ -26,8 +27,7 @@ const headerStyle: React.CSSProperties = {
   minHeight: 64,
   height: 'fit-content',
   lineHeight: '20px',
-  padding: 0,
-  minWidth: 'var(--max-width)',
+  padding: 0, 
 };
 
 const { Search } = Input;
@@ -42,37 +42,24 @@ export function OGMainLayoutHeader() {
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: 'Thông tin tài khoản',
+      label: 'Tài khoản',
     },
     {
       key: '5',
-      label: <Link href="/seller">Gian hàng của tôi</Link>,
+      label: <Link href="/seller">Gian hàng</Link>,
       onClick: () => {
         navigate.push('/seller');
       },
     },
     {
       key: '2',
-      label: 'Đơn hàng của tôi',
-    },
-    {
-      key: '3',
-      label: 'Trung tâm hỗ trợ',
+      label: 'Đơn hàng',
     },
     {
       key: '4',
       label: 'Đăng xuất',
       onClick: () => {
-        updateSession({
-          ...session,
-          user: {
-            ...session?.user,
-            firstName: '',
-            lastName: '',
-            email: '',
-          },
-          isAuthenticated: false,
-        });
+        updateSession(null);
       },
     },
   ];
@@ -103,16 +90,23 @@ export function OGMainLayoutHeader() {
           </Col>
           <Col className="account">
             <Space size="large">
-              <Button
-                type="text"
-                size="large"
-                href="/cart"
-                icon={
-                  <Badge size="small" count={cart?.items?.length || 0}>
-                    <ShoppingCartOutlined />
-                  </Badge>
+              <Link
+                href={
+                  session.isAuthenticated
+                    ? COMMON_PAGE.CART.PATH
+                    : COMMON_PAGE.SIGN_IN.PATH
                 }
-              ></Button>
+              >
+                <Button
+                  type="text"
+                  size="large"
+                  icon={
+                    <Badge size="small" count={cart?.items?.length || 0}>
+                      <ShoppingCartOutlined />
+                    </Badge>
+                  }
+                ></Button>
+              </Link>
               {session?.isAuthenticated ? (
                 <Dropdown
                   menu={{ items }}
@@ -129,9 +123,9 @@ export function OGMainLayoutHeader() {
                   type="text"
                   size="large"
                   icon={<UserOutlined />}
-                  href="./auth/buyer/sign-in"
+                  href="/auth/buyer/sign-in"
                 >
-                  Tài Khoản
+                  Đăng nhập
                 </Button>
               )}
             </Space>

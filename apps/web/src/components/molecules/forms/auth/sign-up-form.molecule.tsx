@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import { COMMON_PAGE } from '@shopizer/constants';
+import { COMMON_PAGE, SELLER_PAGE } from '@shopizer/constants';
 import { SignUpFormValues } from '@shopizer/types/form';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -21,6 +21,9 @@ const { Title } = Typography;
 
 interface MSignUpFormProps {
   onFinish?: (values: SignUpFormValues) => void;
+  errorMessage?: string;
+  loading?: boolean;
+  userType: string;
 }
 
 export function MSignUpForm(props: MSignUpFormProps) {
@@ -29,6 +32,19 @@ export function MSignUpForm(props: MSignUpFormProps) {
   };
   return (
     <Card style={{ width: 500 }}>
+      <div
+        style={{ display: 'flex', justifyContent: 'center', margin: '40px 0' }}
+      >
+        <Link href="/">
+          <Image
+            loading="eager"
+            src="/shopizer-logo.png"
+            width={300}
+            height={50}
+            alt="logo"
+          />
+        </Link>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'start' }}>
         <Title level={2}>Đăng ký </Title>
       </div>
@@ -37,6 +53,7 @@ export function MSignUpForm(props: MSignUpFormProps) {
         className="sign-up-form"
         layout="vertical"
         onFinish={onFinish}
+        disabled={props.loading}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -73,6 +90,7 @@ export function MSignUpForm(props: MSignUpFormProps) {
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (
+                  !value ||
                   new RegExp(
                     '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})',
                   ).test(value)
@@ -119,18 +137,33 @@ export function MSignUpForm(props: MSignUpFormProps) {
             autoComplete="new-password"
           />
         </Form.Item>
+        <div style={{ display: 'flex', justifyContent: 'start' }}>
+          {props.errorMessage && (
+            <p style={{ color: 'red', margin: 0 }}>{props.errorMessage}</p>
+          )}
+        </div>
         <Form.Item style={{ marginTop: 8 }}>
           <Button
             type="primary"
             htmlType="submit"
             className="login-form-button"
             block
+            loading={props.loading}
           >
             Đăng ký
           </Button>
         </Form.Item>
         Bạn đã có tài khoản?
-        <Link href={COMMON_PAGE.SIGN_IN.PATH}>Đăng nhập</Link>
+        <Link
+          aria-disabled
+          href={
+            props.userType === 'seller'
+              ? SELLER_PAGE.SIGN_IN.PATH
+              : COMMON_PAGE.SIGN_IN.PATH
+          }
+        >
+          Đăng nhập
+        </Link>
       </Form>
     </Card>
   );
