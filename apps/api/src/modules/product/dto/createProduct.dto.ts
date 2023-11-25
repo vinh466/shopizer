@@ -91,6 +91,11 @@ class CreateProductDto {
 
   @Type(() => TierVariation)
   public tierVariation: TierVariation[];
+
+
+  @IsString()
+  @IsOptional()
+  public productVariantId: string;
 }
 
 export default CreateProductDto;

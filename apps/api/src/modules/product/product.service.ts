@@ -17,6 +17,7 @@ class ProductService {
     variation: TierVariation[],
     modelList: ModelList[]
   ): {
+      id?: string
     price: number;
     stock: number;
     variation: any;
@@ -61,7 +62,7 @@ class ProductService {
     return variationMix;
   }
   public async create(data: CreateProductDto, sellerId: string) {
-    console.log("crate", data);
+    // console.log("crate", data);
     const {
       category,
       description,
@@ -92,7 +93,7 @@ class ProductService {
     const categoryId = category.find((item) => item.isLeaf)?.value;
     if (!categoryId) throw new CategoryInvalidException();
 
-    return await this.prisma.product.create({
+    const result = await this.prisma.product.create({
       data: {
         Seller: {
           connect: {
@@ -132,10 +133,20 @@ class ProductService {
         ProductVariant: true,
       },
     });
+    await this.prisma.seller.update({
+      where: {
+        id: sellerId
+      },
+      data: {
+        addNewProductAt: new Date()
+      }
+    })
+    return result
   }
 
-  public async update(id: CreateProductDto, data: any) {
-    console.log("crate", data);
+  public async update(id: string, data: CreateProductDto, sellerId: string) {
+
+    console.log("update", data)
     const {
       category,
       description,
@@ -154,19 +165,42 @@ class ProductService {
       ? this.getVariation(tierVariation, modelList)
       : [
         {
+          id: data?.productVariantId,
           price,
           stock,
           variation: [],
           name: "default",
         },
       ];
-
-    console.log(productVariant);
+    const updateProductVariant = productVariant.filter(item => item.id)
+    const newProductVariant = productVariant.filter(item => !item.id)
+    console.log(productVariant)
+    console.log(updateProductVariant)
+    // if()
 
     const categoryId = category.find((item) => item.isLeaf)?.value;
     if (!categoryId) throw new CategoryInvalidException();
 
-    return await this.prisma.product.create({
+
+    const results = await prisma.$transaction(updateProductVariant.map(item => {
+      return this.prisma.productVariant.update({
+        where: {
+          id: item.id
+        },
+        data: {
+          price: item.price,
+          stock: item.stock,
+          variationName: item.name,
+          variation: item.variation,
+        }
+      })
+    }));
+    console.log(results)
+
+    const result = await this.prisma.product.update({
+      where: {
+        id: id
+      },
       data: {
         name,
         description,
@@ -186,7 +220,7 @@ class ProductService {
         } as any,
         ProductVariant: {
           createMany: {
-            data: productVariant.map((item) => {
+            data: newProductVariant.map((item) => {
               return {
                 price: item.price,
                 stock: item.stock,
@@ -201,6 +235,17 @@ class ProductService {
         ProductVariant: true,
       },
     });
+
+    await this.prisma.seller.update({
+      where: {
+        id: sellerId
+      },
+      data: {
+        addNewProductAt: new Date()
+      }
+    })
+
+    return result
   }
 
   public async findOne({ id }: { id: string }) {
@@ -210,6 +255,7 @@ class ProductService {
       },
     });
   }
+
   public async findSellerListProductAll({
     search = "",
     currentPage = 1,
@@ -243,6 +289,7 @@ class ProductService {
       results,
     };
   }
+
   public async findAll({
     search = "",
     currentPage = 1,
@@ -262,6 +309,8 @@ class ProductService {
       include: {
         ProductVariant: true,
         Seller: true,
+        Auction: true,
+        Category: true, 
       },
       where: {},
     };
@@ -274,6 +323,67 @@ class ProductService {
       currentPage,
       total: count,
       results,
+    };
+  }
+
+  async productSellerGroup({
+    search = "",
+    currentPage = 1,
+    pageSize = 10,
+    sort,
+    filter,
+  }: {
+    search?: string;
+    currentPage?: number;
+    pageSize?: number;
+    sort?: string;
+    filter?: string;
+  } = {}) {
+
+
+    const query: Prisma.SellerFindManyArgs = {
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+      include: {
+        pickupAddress: true,
+        products: {
+          include: {
+            ProductVariant: true,
+            Category: true,
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        },
+        user: true,
+      },
+      where: {
+        products: {
+          some: {
+            status: {
+              equals: $Enums.ProductStatus.ACTIVE
+            }
+          }
+        },
+        addNewProductAt: {
+          not: null
+        }
+      },
+      orderBy: {
+        addNewProductAt: 'desc'
+      }
+    };
+    const [results, count] = await prisma.$transaction([
+      this.prisma.seller.findMany(query),
+      prisma.seller.count({ where: query.where }),
+    ]);
+
+
+    return {
+      pageSize,
+      currentPage,
+      total: count,
+      results: results,
     };
   }
 
@@ -338,6 +448,14 @@ class ProductService {
         OrderItem: { include: { order: true } },
         Category: {
           include: {
+            products: {
+              where: {
+                status: PRODUCT_STATUS.ACTIVE,
+                id: {
+                  not: id
+                }
+              },
+            },
             parent: {
               include: {
                 parent: {

@@ -3,14 +3,15 @@ import RequestWithUser from "@shopizer/types/requestWithUser.interface";
 import { Router, Request, Response, NextFunction } from "express";
 import UserNotFoundException from "./exceptions/UserNotFoundException";
 import NotAuthorizedException from "./exceptions/NotAuthorizedException";
-import { Controller, Get } from "@shopizer/decorators";
+import { Controller, Get, Patch, Post } from "@shopizer/decorators";
 import UserService from "./user.service";
+import { FileUploadMiddleware } from "@shopizer/middleware/file-update.middleware";
 
 @Controller("user")
 class UserController {
   userServices = new UserService();
 
-  constructor() {}
+  constructor() { }
 
   @Get("/profile", authMiddleware)
   async getUserById(request: Request, response: Response, next: NextFunction) {
@@ -41,7 +42,45 @@ class UserController {
       }
     } catch (error) {
       next(error);
-    } 
+    }
+  }
+  @Patch("/seller/profile", authMiddleware)
+  async updateSellerProfile(request: Request, response: Response, next: NextFunction) {
+    try {
+      const payload = request.body;
+      console.log(payload)
+      const id = request.user.id;
+      const result = await this.userServices.updateSellerProfile(payload);
+
+      if (result) {
+        response.send(result);
+      } else {
+        next(new UserNotFoundException(id));
+      }
+    } catch (error) {
+      console.log(error)
+      next(error);
+    }
+  }
+  @Post(
+    "/seller/image/update",
+    authMiddleware,
+    FileUploadMiddleware({
+      fields: [{ name: "seller-avatar", maxCount: 1 }],
+      dest: "images/seller",
+    }))
+  async updateSellerImage(request: Request, response: Response, next: NextFunction) {
+    const file = request.files?.["seller-avatar"]?.[0];
+    if (file === undefined) {
+      return response.status(400).json({
+        error: true,
+        message: "Tải file không thành công xin hãy thử lại!",
+      });
+    }
+    return response.status(200).json({
+      success: true,
+      file,
+    });
   }
 }
 

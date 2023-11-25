@@ -35,11 +35,11 @@ class App {
   public getServer() {
     return this.app;
   }
-
+  allowCrossDomain = ["http://localhost:3000", "https://origin2.com"]
   private initializeMiddlewares() {
     this.app.use(
       cors({
-        origin: process.env.CLIENT_URL,
+        origin: (process.env.CLIENT_URL || '').split(','),
         credentials: true,
       })
     );

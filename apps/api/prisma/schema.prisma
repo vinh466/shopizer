@@ -14,7 +14,7 @@ model User {
     firstName String?
     lastName  String?
 
-    createdAt            DateTime              @default(now()) 
+    createdAt            DateTime              @default(now())
     deliveryAddresses    Address[]
     auctions             Auction[]
     orders               Order[]
@@ -34,11 +34,12 @@ model Admin {
 }
 
 model Seller {
-    id          String       @id
-    name        String
-    description String?
-    image       String?
-    status      SellerStatus @default(PENDING)
+    id              String       @id
+    name            String
+    description     String?
+    image           String?
+    status          SellerStatus @default(PENDING)
+    addNewProductAt DateTime?
 
     user          User      @relation(fields: [id], references: [id])
     pickupAddress Address[]

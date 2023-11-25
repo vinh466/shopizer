@@ -108,7 +108,7 @@ class AuthenticationController {
       const userId = request.user.id
       const payload = request.body || {}
       const result = await this.authenticationService.sellerVerify({ userId, ...payload })
-      return response.status(200).json({ message: "Logout successful", results: result });
+      return response.status(200).json({ results: result });
     } catch (error) {
       console.error(error)
       next(error)

@@ -27,8 +27,11 @@ class ProductController {
   }
   @Get("/list")
   async getProduct(request: Request, response: Response) {
-    const product = await this.productService.findAll();
-    response.json(product);
+    const { type } = request.query
+    let result = null
+    if (!type) result = await this.productService.findAll();
+    if (type === 'seller-group') result = await this.productService.productSellerGroup();
+    response.json(result);
   }
   @Get("/seller/list", authMiddleware,)
   async getSellerProduct(request: Request, response: Response) {
@@ -58,13 +61,18 @@ class ProductController {
   }
   @Patch("/:id", authMiddleware, DtoValidation(UpdateProductDto))
   async modify(request: Request, response: Response, next: NextFunction) {
-    const id = request.params.id;
-    const productData: UpdateProductDto = request.body;
-    console.log(productData)
-    if (id) {
-      response.send(id);
-    } else {
-      next(new ProductNotFoundException(id));
+    const sellerId = request.user.id;
+    const id = request.params.id; 
+    const productData: CreateProductDto = request.body;
+    try {
+      const createdProduct = await this.productService.update(id, productData, sellerId);
+      response.status(201).json({
+        message: "Cập nhập phẩm thành công",
+        data: createdProduct,
+      })
+    } catch (error) {
+      console.error(error)
+      next(error)
     }
   }
   @Post("/", authMiddleware, DtoValidation(CreateProductDto))
