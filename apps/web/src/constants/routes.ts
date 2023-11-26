@@ -48,6 +48,10 @@ export const SELLER_PAGE = {
     PATH: '/seller',
     TITLE: 'Seller Dashboard',
   },
+  ORDER: {
+    PATH: '/seller/order',
+    TITLE: 'Seller Order',
+  },
   SIGN_IN: {
     PATH: '/auth/seller/sign-in',
     TITLE: 'Sign In',

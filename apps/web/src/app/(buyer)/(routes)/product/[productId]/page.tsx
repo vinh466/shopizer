@@ -11,10 +11,13 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState<any>(null);
   const [basePrice, setBasePrice] = useState<any>(null);
+  const [isOutOfStock, setIsOutOfStock] = useState<any>(false);
 
   useEffect(()=>{
     productApi.getProduct(productId).then((res)=>{
       console.log(res);
+      const isOutOfStock = res.ProductVariant?.every((item:any)=> item.stock === 0)
+      setIsOutOfStock(isOutOfStock)
       setProduct(res)
     }).finally(()=>{
       setLoading(false)
@@ -35,14 +38,21 @@ export default function ProductDetailPage() {
           </Affix>
         </Col>
         <Col span="12">
-          <MProductDetail product={product} onSelectPrice={(v)=>{
-            setBasePrice(v);
-          }} />
+          <MProductDetail
+            product={product}
+            onSelectPrice={(v) => { 
+              setBasePrice(v);
+            }}
+          />
         </Col>
         <Col span="6">
           <Affix offsetTop={16}>
             <div className="sticky-scroll-bar">
-              <MCartCard product={product} basePrice={basePrice}/>
+              <MCartCard
+                product={product}
+                basePrice={basePrice}
+                isOutOfStock={isOutOfStock}
+              />
             </div>
           </Affix>
         </Col>

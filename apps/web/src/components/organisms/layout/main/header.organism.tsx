@@ -63,6 +63,10 @@ export function OGMainLayoutHeader() {
       },
     },
   ];
+
+  useEffect(() => {
+    console.log("Cart Change", cart);
+  },[cart])
   return (
     <Header style={headerStyle} className="header">
       <TContainer>

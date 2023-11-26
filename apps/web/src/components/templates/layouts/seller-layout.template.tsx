@@ -96,40 +96,27 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
               {
                 key: 'product',
                 icon: <UserOutlined />,
-                label: 'Product',
+                label: 'Sản phẩm',
                 children: [
                   {
                     key: SELLER_PRODUCT_PAGE.LIST.PATH,
                     icon: <UserOutlined />,
                     onClick: () => router.push(SELLER_PRODUCT_PAGE.LIST.PATH),
-                    label: 'List',
+                    label: 'Dang sách',
                   },
                   {
                     key: SELLER_PRODUCT_PAGE.ADD.PATH,
                     icon: <UserOutlined />,
                     onClick: () => router.push(SELLER_PRODUCT_PAGE.ADD.PATH),
-                    label: 'Add',
+                    label: 'Thêm mới',
                   },
                 ],
               },
               {
-                key: 'shop',
+                key: SELLER_PAGE.ORDER.PATH,
                 icon: <UserOutlined />,
-                label: 'Shop',
-                children: [
-                  {
-                    key: SELLER_SHOP_PAGE.PROFILE.PATH,
-                    icon: <UserOutlined />,
-                    onClick: () => router.push(SELLER_SHOP_PAGE.PROFILE.PATH),
-                    label: 'Profile',
-                  },
-                  // {
-                  //   key: SELLER_SHOP_PAGE.RATING.PATH,
-                  //   icon: <UserOutlined />,
-                  //   onClick: () => router.push(SELLER_SHOP_PAGE.RATING.PATH),
-                  //   label: 'Rating',
-                  // },
-                ],
+                onClick: () => router.push(SELLER_PAGE.ORDER.PATH),
+                label: 'Đơn hàng',
               },
             ]}
           />
@@ -165,7 +152,7 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                     <Button
                       type="text"
                       size="large"
-                      className='d-flex align-items-center'
+                      className="d-flex align-items-center"
                       icon={
                         <Avatar
                           size={30}
@@ -187,7 +174,9 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
                         />
                       }
                     >
-                      <span style={{lineHeight: 30}}>{session?.seller?.name}</span>
+                      <span style={{ lineHeight: 30 }}>
+                        {session?.seller?.name}
+                      </span>
                     </Button>
                   </div>
                 </Dropdown>
@@ -206,6 +195,10 @@ export function TSaleLayout({ children }: { children: React.ReactNode }) {
           <Content
             style={{
               padding: 20,
+              backgroundColor: '#f5f5f5',
+              backgroundImage: "url('/auth-bg.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'bottom',
             }}
           >
             {children}

@@ -33,16 +33,16 @@ export const saleDashboardTabTable = [
     tableCol: saleOperationalEfficiencyTable,
     apiEndpoint: SUMMARY_ENDPOINT.SALE_VIOLATION,
   },
-  {
-    tabId: '3',
-    tabLabel: 'Chăm sóc khách hàng',
-    tableCol: saleOperationalEfficiencyTable,
-    apiEndpoint: SUMMARY_ENDPOINT.CUSTOMER_CARE,
-  },
-  {
-    tabId: '4',
-    tabLabel: 'Mức độ hài lòng của Người Mua',
-    tableCol: saleOperationalEfficiencyTable,
-    apiEndpoint: SUMMARY_ENDPOINT.BUYER_SATISFACTION,
-  },
+  // {
+  //   tabId: '3',
+  //   tabLabel: 'Chăm sóc khách hàng',
+  //   tableCol: saleOperationalEfficiencyTable,
+  //   apiEndpoint: SUMMARY_ENDPOINT.CUSTOMER_CARE,
+  // },
+  // {
+  //   tabId: '4',
+  //   tabLabel: 'Mức độ hài lòng của Người Mua',
+  //   tableCol: saleOperationalEfficiencyTable,
+  //   apiEndpoint: SUMMARY_ENDPOINT.BUYER_SATISFACTION,
+  // },
 ];

@@ -16,11 +16,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRecoilState } from 'recoil';
 import { sessionState } from '@shopizer/stores';
+import { adminSessionState } from 'src/stores/admin-session.store';
 
 const { Content, Header, Sider } = Layout;
 
 export function TAdminLayout({ children }: { children: React.ReactNode }) {
   const [session, updateSession] = useRecoilState(sessionState);
+  const [adminSession, updateAdminSession] = useRecoilState(adminSessionState);
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const pathName = usePathname();
@@ -40,6 +42,7 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
         <Sider
           trigger={null}
           collapsible
+          width={280}
           collapsed={collapsed}
           style={{
             overflow: 'auto',
@@ -85,22 +88,22 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
                 label: 'Dashboard',
               },
               {
-                key: 'shop',
-                icon: <UserOutlined />,
-                label: 'Shop',
+                key: SELLER_PAGE.DASHBOARD.PATH,
+                icon: <UserOutlined />, 
+                label: 'Quản lý người bán',
                 children: [
                   {
                     key: SELLER_SHOP_PAGE.PROFILE.PATH,
                     icon: <UserOutlined />,
                     onClick: () => router.push(SELLER_SHOP_PAGE.PROFILE.PATH),
-                    label: 'Profile',
+                    label: 'Duyệt người bán',
                   },
-                  // {
-                  //   key: SELLER_SHOP_PAGE.RATING.PATH,
-                  //   icon: <UserOutlined />,
-                  //   onClick: () => router.push(SELLER_SHOP_PAGE.RATING.PATH),
-                  //   label: 'Rating',
-                  // },
+                  {
+                    key: SELLER_SHOP_PAGE.RATING.PATH,
+                    icon: <UserOutlined />,
+                    onClick: () => router.push(SELLER_SHOP_PAGE.RATING.PATH),
+                    label: 'Khóa người bán',
+                  },
                 ],
               },
             ]}
@@ -126,7 +129,8 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
                 }}
               />
               {/* Dashboard / Product */}
-              {session?.isAuthenticated && session?.seller?.name ? (
+              {adminSession?.isAuthenticated &&
+              adminSession?.admin?.username ? (
                 <Dropdown
                   menu={{ items }}
                   placement="bottomRight"
@@ -134,7 +138,7 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
                   trigger={['click']}
                 >
                   <Button type="text" size="large" icon={<UserOutlined />}>
-                    {session?.seller?.name}
+                    {adminSession?.admin?.username}
                   </Button>
                 </Dropdown>
               ) : (

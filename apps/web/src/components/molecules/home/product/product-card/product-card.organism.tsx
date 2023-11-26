@@ -55,6 +55,7 @@ export function OGProductCard(props: OGProductCardProps) {
                 src={BACKEND_PRODUCT_IMAGE_PATH + props?.product?.image}
                 width={props.gallery ? '256' : '200'}
                 height={props.gallery ? '256' : '200'}
+                style={{ objectFit: 'contain' }}
               />
             )}
           </div>
@@ -63,12 +64,12 @@ export function OGProductCard(props: OGProductCardProps) {
         {!props.gallery && (
           <>
             <h3 className="product-card__desc">{props.product?.name} </h3>
-            <Rate
+            {/* <Rate
               defaultValue={3}
               disabled
               character={({ index }: any) => customIcons[index + 1]}
               style={{ margin: '4px 0' }}
-            />
+            /> */}
             <div className="product-card__price">
               <span>
                 {getProductPriceString(props.product?.ProductVariant || [])}
@@ -103,7 +104,7 @@ export function OGProductCard(props: OGProductCardProps) {
               padding: 0px;
             }
             .product-card__image {
-              padding: 8px;                                                                                                                                                                                            
+              padding: 8px;
               & img {
                 border-radius: 6px;
                 border: 1px solid #f0f0f0;
@@ -116,9 +117,10 @@ export function OGProductCard(props: OGProductCardProps) {
             -webkit-line-clamp: 2;
             overflow: hidden;
             white-space: break-spaces;
-            font-weight: 400;
-            font-size: 12px;
+            font-weight: 500;
+            font-size: 14px;
             line-height: 150%;
+            min-height: 36px;
             color: rgb(39, 39, 42);
             margin: 0px;
             word-break: break-word;
@@ -128,7 +130,8 @@ export function OGProductCard(props: OGProductCardProps) {
             font-size: 16px;
             line-height: 150%;
             font-weight: 500;
-            color: rgb(39, 39, 42);
+            // color: rgb(39, 39, 42);
+            color: #1890ff;
             margin: 0px;
             display: flex;
             -webkit-box-align: center;

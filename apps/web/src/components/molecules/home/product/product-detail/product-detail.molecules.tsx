@@ -33,33 +33,33 @@ export function MProductDetail(props: MProductDetailProps) {
   };
   useEffect(() => {
     if (
-        props.product?.ProductVariant?.length > 1 &&
-        props.product?.ProductVariant[0]?.variationName !== 'default'
-      ) {
-        const tierLength =
-          props.product?.variationConfig?.tierVariation?.length;
-        let modelList = props.product?.variationConfig?.modelList || [];
-        if (tierLength === 1) {
-          modelList = [modelList];
-        }
-        const options = props.product?.variationConfig?.tierVariation?.map(
-          (item: any, tierIndex: number) => ({
-            name: item.name,
-            options: item.options.map((option: any, index: number) => {
-              const optionsLength = item.options?.length || 0;
-              return {
-                name: option,
-                stock: modelList[tierIndex][index]?.stock || 0,
-              };
-            }),
-          }),
-        );
-        console.log(options);
-        setOptions(options);
+      props.product?.ProductVariant?.length > 1 &&
+      props.product?.ProductVariant[0]?.variationName !== 'default'
+    ) {
+      const tierLength = props.product?.variationConfig?.tierVariation?.length;
+      let modelList = props.product?.variationConfig?.modelList || [];
+      if (tierLength === 1) {
+        modelList = [modelList];
       }
+      const options = props.product?.variationConfig?.tierVariation?.map(
+        (item: any, tierIndex: number) => ({
+          name: item.name,
+          options: item.options.map((option: any, index: number) => {
+            const optionsLength = item.options?.length || 0;
+            return {
+              name: option,
+              modelList,
+            };
+          }),
+        }),
+      );
+      console.log(options);
+      setOptions(options);
+    }
   }, [props.product?.ProductVariant]);
 
   useEffect(() => {
+      console.log(JSON.stringify(selected,null,2));
     if (
       props.product?.ProductVariant?.length > 0 &&
       props.product?.ProductVariant[0]?.variationName == 'default'
@@ -93,6 +93,9 @@ export function MProductDetail(props: MProductDetailProps) {
       }
       return;
     }
+
+
+    
     if (props.product?.ProductVariant?.length > 0) {
       const priceRange = getProductPrice(props.product?.ProductVariant || []);
       if (!priceRange) {
@@ -153,18 +156,35 @@ export function MProductDetail(props: MProductDetailProps) {
               <h4>{item.name}</h4>
             </div>
             <Space className="mb-3">
-              {item?.options?.map((option: any, index: number) => (
-                <Button
-                  disabled={(!selected[0]?.length && tierIndex !== 0) || !option?.stock}
-                  key={index}
-                  className={
-                    selected?.[tierIndex]?.[0] === index ? 'selected' : ''
-                  }
-                  onClick={() => handleSelectType(tierIndex, index)}
-                >
-                  {option?.name}
-                </Button>
-              ))}
+              {item?.options?.map((option: any, index: number) => {
+                
+                return (
+                  <Button
+                    disabled={
+                      (!selected[0]?.length && tierIndex !== 0) ||
+                      option?.modelList[selected?.[0]?.[0]]?.[index]?.stock ===
+                        0 ||
+                      (tierIndex === 0 &&
+                        option.modelList?.[index]?.every(
+                          (i: any) => i?.stock === 0,
+                        ))
+                    }
+                    key={index}
+                    className={
+                      (tierIndex === 0 && selected?.[0]?.[0] === index) ||
+                      (tierIndex === 1 && selected?.[1]?.[0] === index)
+                        ? 'selected'
+                        : ''
+                    }
+                    onClick={() => {
+                      tierIndex === 0 && console.log(option.modelList?.[0]); 
+                      handleSelectType(tierIndex, index);
+                    }}
+                  >
+                    {option?.name}
+                  </Button>
+                );
+              })}
             </Space>
           </div>
         ))}

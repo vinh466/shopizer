@@ -1,7 +1,17 @@
 'use client';
 
-import { cartState } from '@shopizer/stores';
-import { Button, Result, Row, Col, Steps, InputNumber, Affix } from 'antd';
+import { cartState, orderState, sessionState } from '@shopizer/stores';
+import {
+  Button,
+  Result,
+  Row,
+  Col,
+  Steps,
+  InputNumber,
+  Affix,
+  notification,
+  Form,
+} from 'antd';
 import { useRecoilState } from 'recoil';
 import {
   CheckSquareOutlined,
@@ -9,14 +19,21 @@ import {
   SolutionOutlined,
   PayCircleOutlined,
 } from '@ant-design/icons';
-import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MLCartTable } from '@shopizer/molecules';
 import Link from 'next/link';
 import { COMMON_PAGE } from '@shopizer/constants';
+import { MConfirmCartInfo } from 'src/components/molecules/cart/confirm-cart-info/confirm-cart-info.molecule';
+import { MCartPayment } from 'src/components/molecules/cart/cart-payment/cart-payment.molecule';
+import { buyerApi } from '@shopizer/apis/buyer/buyer';
+import { set } from 'lodash';
 
 export default function CartPage() {
+  const [cartSelected, setCartSelected] = useState<string[]>([]);
+  const [session, setSession] = useRecoilState(sessionState);
   const [cart, setCart] = useRecoilState(cartState);
+  const [verifyForm] = Form.useForm();
+  const [order, setOrderState] = useRecoilState(orderState);
   const [paymentSteps, setPaymentSteps] = useState([
     {
       title: 'Xác nhận sản phẩm',
@@ -39,30 +56,174 @@ export default function CartPage() {
       icon: <SmileOutlined />,
     },
   ]);
+  const [currentStep, setCurrentStep] = useState(0);
   const price = 1000000 * (cart?.items[0]?.quantity || 1);
   const setStep = (
     index: number,
     status: 'wait' | 'finish' | 'error' | 'process' = 'wait',
   ) => {
-    const newSteps = [...paymentSteps];
-    for (let i = 0; i <= index; i++) {
-      newSteps[i].status = 'process';
+    const newSteps = paymentSteps.map((item: any) => ({
+      ...item,
+      status: 'wait',
+    }));
+    for (let i = 0; i < index; i++) {
+      newSteps[i].status = 'finish';
     }
+    newSteps[index].status = 'process';
     setPaymentSteps(newSteps);
   };
+  function handleChangeOrder() {
+    const orderItems = cart.items
+      .map((sellerItem: any) => {
+        const cartItems = sellerItem?.cartItems
+          ?.map((productItem: any) => {
+            const cartVariants = productItem.cartVariants.filter(
+              (variant: any) => cartSelected.includes(variant.id),
+            );
+            if (cartVariants.length > 0) {
+              return {
+                ...productItem,
+                cartVariants,
+              };
+            } else {
+              return null;
+            }
+          })
+          .filter((item: any) => item !== null);
+        if (cartItems.length > 0) {
+          return {
+            ...sellerItem,
+            cartItems,
+          };
+        } else {
+          return null;
+        }
+      })
+      .filter((item: any) => item !== null);
+    setOrderState({
+      ...order,
+      itemIds: cartSelected,
+      orderItems,
+      cart,
+    });
+  }
+  function handleConfirmProduct() {
+    if (cartSelected.length === 0) {
+      notification.error({
+        message: 'Vui lòng chọn sản phẩm',
+      });
+      return;
+    } else {
+      handleChangeOrder()
+      setCurrentStep(currentStep + 1);
+      setStep(currentStep + 1);
+    }
+  }
 
+  function handleVerify() {
+    verifyForm.validateFields().then((values) => {
+      console.log(session?.user?.id);
+      setOrderState({
+        ...order,
+        buyer: {
+          ...order?.buyer,
+          ...values,
+          userId: session?.user?.id,
+        },
+      });
+      setCurrentStep(currentStep + 1);
+      setStep(currentStep + 1);
+    });
+  }
+  function getOrderTotalPrice() {
+    console.log(order);
+    return order?.orderItems?.reduce((total: number, item: any) => {
+      return (
+        total +
+        item?.cartItems?.reduce((total: number, product: any) => {
+          return (
+            total +
+            product?.cartVariants?.reduce((total: number, variant: any) => { 
+              console.log(total , variant?.quantity , variant?.price);
+              return total + (variant?.quantity || 1) * variant?.price;
+            }, 0)
+          );
+        }, 0)
+      );
+    }
+    , 0);
+  };
+  function handlePayment() {
+    buyerApi.order(order).then((res) => {
+      if(!res.errorStatusCode) {
+
+        notification.success({
+          message: 'Đặt hàng thành công',
+        });
+        setOrderState({
+          ...order,
+          ...res,
+        });
+        setCurrentStep(currentStep + 1);
+        setStep(currentStep + 1);
+      }
+    }
+    );
+  }
+
+  useEffect(() => {
+    console.log('order', order);
+  }, [order]);
+  
+  useEffect(() => {
+    handleChangeOrder();
+  }, [cart, cartSelected]);
+  
   return (
     <div>
       {cart?.items?.length > 0 ? (
         <Row className="cart-page" gutter={16}>
           <Col flex="1">
-            <Row className="card-steps" style={{ marginBottom: 16 }}>
+            <Row className="cart-step" style={{ marginBottom: 16 }}>
               <Col span="24">
                 <Steps size="small" items={paymentSteps as any} />
               </Col>
             </Row>
 
-            <MLCartTable />
+            {currentStep === 1 && (
+              <Row className="cart-confirm-info" style={{ marginBottom: 16 }}>
+                <Col span="24">
+                  Xác nhận thông tin
+                  <MConfirmCartInfo form={verifyForm} />
+                </Col>
+              </Row>
+            )}
+            {(currentStep == 0 || currentStep == 1) && (
+              <MLCartTable
+                isConfirm={currentStep > 0}
+                onSelect={setCartSelected}
+              />
+            )}
+            {currentStep === 2 && (
+              <div className="cart-paument-info">
+                <MCartPayment />
+              </div>
+            )}
+            {currentStep === 3 && (
+              <Result
+                status="success"
+                title="Đã mua thành công!"
+                subTitle="Mã đơn hàng: 2017182818828182881 sẽ nhanh chóng giao đến bạn, vui lòng đợi."
+                extra={[
+                  <Button type="primary" key="console">
+                    Đơn hàng
+                  </Button>,
+                  <Link key="home" href={COMMON_PAGE.HOME.PATH}>
+                    <Button key="buy">Mua thêm</Button>
+                  </Link>,
+                ]}
+              />
+            )}
           </Col>
           <Col span="6">
             <Affix offsetTop={16}>
@@ -71,7 +232,7 @@ export default function CartPage() {
                   <div className="product-price">
                     <div className="title">Tạm Tính</div>
                     <div>
-                      {price?.toLocaleString('vi-VN', {
+                      {(getOrderTotalPrice() || 0)?.toLocaleString('vi-VN', {
                         style: 'currency',
                         currency: 'VND',
                       })}
@@ -79,12 +240,43 @@ export default function CartPage() {
                   </div>
                   <div className="cart-action">
                     <div>
-                      <Button
-                        style={{ width: '100%' }}
-                        onClick={() => setStep(1)}
-                      >
-                        Mua Hàng
-                      </Button>
+                      {currentStep === 0 && (
+                        <Button
+                          type="primary"
+                          style={{ width: '100%' }}
+                          onClick={() => handleConfirmProduct()}
+                        >
+                          Xác nhận sản phẩm
+                        </Button>
+                      )}
+
+                      {currentStep === 1 && (
+                        <Button
+                          type="primary"
+                          style={{ width: '100%' }}
+                          htmlType="submit"
+                          onClick={() => {
+                            handleVerify();
+                          }}
+                          className="login-form-button"
+                        >
+                          {'Xác nhận thông tin'}
+                        </Button>
+                      )}
+
+                      {currentStep === 2 && (
+                        <Button
+                          type="primary"
+                          style={{ width: '100%' }}
+                          htmlType="submit"
+                          onClick={() => {
+                            handlePayment();
+                          }}
+                          className="login-form-button"
+                        >
+                          Thanh toán
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -112,7 +304,7 @@ export default function CartPage() {
       )}
 
       <style jsx global>{`
-        .card-steps {
+        .cart-step {
           background-color: #fff;
           padding: 16px;
           border-radius: 6px;
@@ -140,6 +332,17 @@ export default function CartPage() {
             bottom: -16px;
             right: 0px;
           }
+        }
+        .cart-confirm-info {
+          background-color: #fff;
+          border-radius: 6px;
+          padding: 16px;
+        }
+        .cart-paument-info {
+          background-color: #fff;
+          border-radius: 6px;
+          padding: 16px;
+          margin-top: 16px;
         }
         .cart-summary {
           background-color: #fff;

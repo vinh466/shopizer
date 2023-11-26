@@ -5,54 +5,78 @@ import React from 'react';
 import OGSummaryStatistic from './widgets/summary-statistic.organism';
 import { OGTabsTable } from '@shopizer/organisms';
 import { saleDashboardTabTable } from '@shopizer/configs/meta/table';
-import { SELLER_ORDER_PAGE, SELLER_PRODUCT_PAGE } from '@shopizer/constants';
+import {
+  SELLER_ENDPOINT,
+  SELLER_ORDER_PAGE,
+  SELLER_PRODUCT_PAGE,
+  SUMMARY_ENDPOINT,
+} from '@shopizer/constants';
+import useSWR from 'swr';
+import { fetcher } from '@shopizer/apis/fetcher';
 
 export function OGDashboard() {
-  const summary = [
-    {
-      title: 'Chờ Xác Nhận',
-      value: '0',
-      href: SELLER_ORDER_PAGE.LIST_UNPAID.PATH,
-    },
-    {
-      title: 'Chờ Lấy Hàng',
-      value: '0',
-      href: SELLER_ORDER_PAGE.LIST_TOSHIP.PATH,
-    },
-    {
-      title: 'Đã Xử Lý',
-      value: '0',
-      href: SELLER_ORDER_PAGE.LIST_COMPLETED.PATH,
-    },
-    {
-      title: 'Đơn Hủy',
-      value: '0',
-      href: SELLER_ORDER_PAGE.LIST_CANCELLED.PATH,
-    },
-    {
-      title: 'Trả Hàng/Hoàn Tiền Chờ Xử Lý',
-      value: '0',
-      href: SELLER_ORDER_PAGE.LIST_RETURN_LIST.PATH,
-    },
-    {
-      title: 'Sản Phẩm Bị Tạm Khóa',
-      value: '0',
-      href: SELLER_PRODUCT_PAGE.LIST_VIOLATE.PATH,
-    },
-    {
-      title: 'Sản Phẩm Hết Hàng',
-      value: '0',
-      href: SELLER_PRODUCT_PAGE.LIST_SOLD_OUT.PATH,
-    },
-  ];
+  const [summary, setSummary] = React.useState<any[]>(
+    getDashboardSummary(null),
+  );
 
+  function getDashboardSummary(summaryValues: any) {
+    const summary = [
+      {
+        title: 'Đơn chờ Xác Nhận',
+        value: summaryValues?.[0]?.value || 0,
+        href: SELLER_ORDER_PAGE.LIST_UNPAID.PATH,
+      },
+      {
+        title: 'Đơn chờ Lấy Hàng',
+        value: summaryValues?.[1]?.value || 0,
+        href: SELLER_ORDER_PAGE.LIST_TOSHIP.PATH,
+      },
+      {
+        title: 'Đơn đã Xử Lý',
+        value: summaryValues?.[2]?.value || 0,
+        href: SELLER_ORDER_PAGE.LIST_COMPLETED.PATH,
+      },
+      {
+        title: 'Đơn Hủy',
+        value: summaryValues?.[3]?.value || 0,
+        href: SELLER_ORDER_PAGE.LIST_CANCELLED.PATH,
+      },
+      // {
+      //   title: 'Trả Hàng/Hoàn Tiền Chờ Xử Lý',
+      //   value: summaryValues?.[4]?.value || 0,
+      //   href: SELLER_ORDER_PAGE.LIST_RETURN_LIST.PATH,
+      // },
+      {
+        title: 'Sản Phẩm Bị Tạm Khóa',
+        value: summaryValues?.[4]?.value || 0,
+        href: SELLER_PRODUCT_PAGE.LIST_VIOLATE.PATH,
+      },
+      {
+        title: 'Sản Phẩm Hết Hàng',
+        value: summaryValues?.[5]?.value || 0,
+        href: SELLER_PRODUCT_PAGE.LIST_SOLD_OUT.PATH,
+      },
+    ];
+    return summary;
+  }
+
+  useSWR(SUMMARY_ENDPOINT.DASHBOARD_SUMMARY, (url) =>
+    fetcher(url).then((res) => {
+      if (!res.errorStatusCode) {
+        const summary = getDashboardSummary(res.results);
+        setSummary(summary);
+      }
+    }),
+  );
   return (
     <>
       <Card style={{ width: '100%' }} className="sales-dashboard">
         <Typography.Title level={3} style={{ marginTop: 0 }}>
-          Danh sách cần làm
+          Tổng quan
         </Typography.Title>
-        <Typography.Paragraph>Những việc bạn sẽ phải làm</Typography.Paragraph>
+        <Typography.Paragraph>
+          Tổng quan về gian hàng của bạn
+        </Typography.Paragraph>
         <Row gutter={16}>
           {summary.map((val, index) => (
             <Col key={index} span={6}>
@@ -80,4 +104,4 @@ export function OGDashboard() {
       </Card>
     </>
   );
-}
+} 

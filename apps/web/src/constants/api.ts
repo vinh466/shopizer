@@ -5,6 +5,11 @@ export const AUTH_ENDPOINT = {
   SIGN_UP: '/auth/sign-up',
   SIGN_OUT: '/auth/sign-out',
 };
+export const BUYER_ENDPOINT = {
+  // VERIFY: '/auth/buyer/verify',
+  // PROFILE: '/user/buyer/profile',
+  ORDER: '/order',
+};
 export const PRODUCT_ENDPOINT = {
   GET: '/product/',
   UPDATE: '/product/', // vs id
@@ -26,6 +31,7 @@ export const SUMMARY_ENDPOINT = {
   ORDER_MANAGEMENT: '/summary/order-management',
   CUSTOMER_CARE: '/summary/customer-care',
   BUYER_SATISFACTION: '/summary/buyer-satisfaction',
+  DASHBOARD_SUMMARY: '/summary/dashboard',
 };
 export const SELLER_ENDPOINT = {
   VERIFY: '/auth/seller/verify',

@@ -194,11 +194,11 @@ export const saleProductTabTable: TabTable = [
     apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
     baseQuery: '?listType=' + PRODUCT_STATUS.VIOLATE,
   },
-  {
-    tabKey: 'unlisted',
-    tabLabel: 'Đã ẩn',
-    tableCol: productTable,
-    apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
-    baseQuery: '?listType=' + PRODUCT_STATUS.UNLISTED,
-  },
+  // {
+  //   tabKey: 'unlisted',
+  //   tabLabel: 'Đã ẩn',
+  //   tableCol: productTable,
+  //   apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+  //   baseQuery: '?listType=' + PRODUCT_STATUS.UNLISTED,
+  // },
 ];
