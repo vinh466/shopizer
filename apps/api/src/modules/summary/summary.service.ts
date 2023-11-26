@@ -12,12 +12,12 @@ export class SummaryService {
       shopValue: 0,
       targetValue: 0,
     },
-    {
-      id: "2",
-      criteria: "Tỉ lệ hàng đặt trước",
-      shopValue: 0 + "%",
-      targetValue: "≤10.00%",
-    },
+    // {
+    //   id: "2",
+    //   criteria: "Tỉ lệ hàng đặt trước",
+    //   shopValue: 0 + "%",
+    //   targetValue: "≤10.00%",
+    // },
     {
       id: "3",
       criteria: "Các vi phạm khác",
@@ -32,12 +32,12 @@ export class SummaryService {
       shopValue: 0 + "%",
       targetValue: "<10.00%",
     },
-    {
-      id: "2",
-      criteria: "Tỷ lệ giao hàng trễ",
-      shopValue: 0 + "%",
-      targetValue: "<10.00%",
-    },
+    // {
+    //   id: "2",
+    //   criteria: "Tỷ lệ giao hàng trễ",
+    //   shopValue: 0 + "%",
+    //   targetValue: "<10.00%",
+    // },
     {
       id: "3",
       criteria: "Thời gian chuẩn bị hàng",
@@ -67,12 +67,122 @@ export class SummaryService {
       targetValue: "≥4.00/5",
     },
   ];
+  async getDashboard(sellerId: string) {
+    const orderCount = await this.prisma.order.count({
+      where: {
+        status: "PENDING",
 
+      },
+    })
+
+    const orderProcessingCount = await this.prisma.order.count({
+      where: {
+        status: "PROCESSING",
+
+      },
+    })
+
+    const orderDoneCount = await this.prisma.order.count({
+      where: {
+        status: "SHIPPED",
+
+      },
+    })
+
+    const orderCanceledCount = await this.prisma.order.count({
+      where: {
+        status: "SHIPPED",
+
+      },
+    })
+
+    const orderViolateCount = await this.prisma.product.count({
+      where: {
+        status: "VIOLATE",
+
+      },
+    })
+
+
+    const productCount = await this.prisma.product.count({
+      where: {
+        sellerId,
+        status: "SOLD_OUT",
+      },
+    })
+
+
+
+    return Promise.resolve([
+      {
+        title: 'Chờ Xác Nhận',
+        value: orderCount,
+      },
+      {
+        title: 'Chờ Lấy Hàng',
+        value: orderProcessingCount,
+      },
+      {
+        title: 'Đã Xử Lý',
+        value: orderDoneCount,
+      },
+      {
+        title: 'Đơn Hủy',
+        value: orderCanceledCount,
+      },
+      // {
+      //   title: 'Trả Hàng/Hoàn Tiền Chờ Xử Lý',
+      //   value: 100,
+      // },
+      {
+        title: 'Sản Phẩm Bị Tạm Khóa',
+        value: orderViolateCount,
+      },
+      {
+        title: 'Sản Phẩm Hết Hàng',
+        value: productCount,
+      },
+    ])
+  }
   async getSaleViolation() {
     return this.saleViolationData;
   }
   async getOrderManagement() {
-    return this.orderManagementData;
+
+    const orderTotalCount = await this.prisma.order.count({
+      where: {
+
+      },
+    })
+
+    const orderCanceledCount = await this.prisma.order.count({
+      where: {
+        status: "SHIPPED",
+
+      },
+    })
+    console.log({ orderCanceledCount, orderTotalCount })
+    const orderViolateCount = await this.prisma.product.count({
+      where: {
+        status: "VIOLATE",
+
+      },
+    })
+    // return this.orderManagementData;
+    return [
+      {
+        id: "1",
+        criteria: "Tỉ lệ đơn không thành công ",
+        shopValue: orderCanceledCount / (orderTotalCount || 1) * 100 + "%",
+        targetValue: "<10.00%",
+      },
+      {
+        id: "3",
+        criteria: "Thời gian chuẩn bị hàng",
+        shopValue: 0,
+        targetValue: "<1.50 days",
+      },
+    ]
   }
   async getCustomerCare() {
     return this.customerCareData;

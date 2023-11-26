@@ -88,6 +88,7 @@ class ProductService {
         },
       ];
 
+    const soldOut = productVariant.every(item => item.stock <= 0) 
     console.log(productVariant);
 
     const categoryId = category.find((item) => item.isLeaf)?.value;
@@ -100,6 +101,7 @@ class ProductService {
             id: sellerId,
           },
         },
+        status: soldOut ? 'SOLD_OUT' : 'ACTIVE',
         name,
         description,
         image: productImage[0].name,
@@ -139,6 +141,37 @@ class ProductService {
       },
       data: {
         addNewProductAt: new Date()
+      }
+    })
+    const modeListWithId = (result['variationConfig'] as any)?.modelList || [];
+    if (modeListWithId?.[0]?.length > 0) {
+      modeListWithId.forEach((model: any, index1: number) => {
+        model.forEach((element: any, index2: number) => {
+          modeListWithId[index1][index2] = {
+            ...element,
+            id:
+              result?.['ProductVariant']?.[index1 * model.length + index2]
+                ?.id || undefined,
+          };
+        });
+      });
+    } else {
+      modeListWithId.forEach((model: any, index1: number) => {
+        modeListWithId[index1] = {
+          ...model,
+          id: result?.['ProductVariant']?.[index1]?.id || undefined,
+        };
+      });
+    }
+    await this.prisma.product.update({
+      where: {
+        id: result.id
+      },
+      data: {
+        variationConfig: {
+          ...(result['variationConfig'] || {} as any),
+          modelList: modeListWithId,
+        }
       }
     })
     return result
@@ -194,8 +227,16 @@ class ProductService {
           variation: item.variation,
         }
       })
-    }));
-    console.log(results)
+    })); 
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id
+      },
+    })
+
+    console.log(updateProductVariant)
+
+    const soldOut = updateProductVariant.every(item => item.stock <= 0) && product?.status === PRODUCT_STATUS.ACTIVE
 
     const result = await this.prisma.product.update({
       where: {
@@ -210,6 +251,7 @@ class ProductService {
             id: categoryId,
           },
         },
+        status: soldOut ? 'SOLD_OUT' : 'ACTIVE',
         imageDesc: productImageDesc?.map((item) => item.name) || [],
         detailList: detailList as any,
         variationConfig: {
@@ -347,6 +389,9 @@ class ProductService {
       include: {
         pickupAddress: true,
         products: {
+          where: {
+            status: PRODUCT_STATUS.ACTIVE
+          },
           include: {
             ProductVariant: true,
             Category: true,
@@ -405,26 +450,25 @@ class ProductService {
     } = {},
     sellerId: string
   ) {
-    const whereQuery: Prisma.ProductWhereInput = { sellerId: sellerId, }
+    const whereQuery: Prisma.ProductWhereInput = { sellerId: sellerId, };
     if (Object.values(PRODUCT_STATUS).includes(filter?.listType as any)) {
       whereQuery['status'] = {
         equals: filter.listType as $Enums.ProductStatus
       }
     }
+    // if (filter.listType === 'sold-out') {
+    //   whereQuery['ProductVariant'] = { every: { stock: { gt: 0 } } }
+    // }
     const query: Prisma.ProductFindManyArgs = {
       skip: (currentPage - 1) * pageSize,
       take: pageSize,
       include: {
         ProductVariant: true,
-        OrderItem: {
-          include: {
-            order: true,
-          }
-        }
+
       },
       where: whereQuery,
       orderBy: {
-        createdAt: 'desc'
+        updatedAt: 'desc'
       }
     };
     const [results, count] = await prisma.$transaction([
@@ -445,7 +489,6 @@ class ProductService {
       include: {
         Seller: true,
         ProductVariant: true,
-        OrderItem: { include: { order: true } },
         Category: {
           include: {
             products: {

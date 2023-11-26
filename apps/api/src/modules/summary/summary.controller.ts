@@ -2,11 +2,19 @@ import { PrismaClient } from "@prisma/client";
 import { Controller, Get } from "@shopizer/decorators";
 import { Response } from "express";
 import { SummaryService } from "./summary.service";
+import authMiddleware from "@shopizer/middleware/auth.middleware";
 
 @Controller("summary")
 export class SummaryController {
   private summaryService = new SummaryService();
-
+  @Get("/dashboard", authMiddleware)
+  async getDashboard(req: any, res: Response) {
+    const id = req.user.id;
+    const summary = await this.summaryService.getDashboard(id);
+    res.json({
+      results: summary,
+    });
+  }
   @Get("/sale-violation")
   async getSaleViolation(req: any, res: Response) {
     const summary = await this.summaryService.getSaleViolation();
