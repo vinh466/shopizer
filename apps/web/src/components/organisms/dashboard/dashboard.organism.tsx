@@ -22,23 +22,28 @@ export function OGDashboard() {
   function getDashboardSummary(summaryValues: any) {
     const summary = [
       {
-        title: 'Đơn chờ Xác Nhận',
+        title: 'Đơn chờ xác nhận',
         value: summaryValues?.[0]?.value || 0,
-        href: SELLER_ORDER_PAGE.LIST_UNPAID.PATH,
+        href: SELLER_ORDER_PAGE.LIST.PATH,
       },
       {
-        title: 'Đơn chờ Lấy Hàng',
+        title: 'Đơn chờ lấy hàng',
         value: summaryValues?.[1]?.value || 0,
-        href: SELLER_ORDER_PAGE.LIST_TOSHIP.PATH,
+        href: SELLER_ORDER_PAGE.LIST_PROCESSING.PATH,
       },
       {
-        title: 'Đơn đã Xử Lý',
+        title: 'Đơn đang vận chuyển',
         value: summaryValues?.[2]?.value || 0,
+        href: SELLER_ORDER_PAGE.LIST_PROCESSING.PATH,
+      },
+      {
+        title: 'Đơn đã giao',
+        value: summaryValues?.[3]?.value || 0,
         href: SELLER_ORDER_PAGE.LIST_COMPLETED.PATH,
       },
       {
-        title: 'Đơn Hủy',
-        value: summaryValues?.[3]?.value || 0,
+        title: 'Đơn hủy',
+        value: summaryValues?.[4]?.value || 0,
         href: SELLER_ORDER_PAGE.LIST_CANCELLED.PATH,
       },
       // {
@@ -47,13 +52,13 @@ export function OGDashboard() {
       //   href: SELLER_ORDER_PAGE.LIST_RETURN_LIST.PATH,
       // },
       {
-        title: 'Sản Phẩm Bị Tạm Khóa',
-        value: summaryValues?.[4]?.value || 0,
+        title: 'Sản phẩm bị khóa',
+        value: summaryValues?.[5]?.value || 0,
         href: SELLER_PRODUCT_PAGE.LIST_VIOLATE.PATH,
       },
       {
-        title: 'Sản Phẩm Hết Hàng',
-        value: summaryValues?.[5]?.value || 0,
+        title: 'Sản phẩm hết hàng',
+        value: summaryValues?.[6]?.value || 0,
         href: SELLER_PRODUCT_PAGE.LIST_SOLD_OUT.PATH,
       },
     ];

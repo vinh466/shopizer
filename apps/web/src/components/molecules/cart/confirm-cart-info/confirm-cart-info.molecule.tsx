@@ -14,7 +14,7 @@ export function MConfirmCartInfo(props: MConfirmCartInfoProps) {
   const [order, setOrderState] = useRecoilState(orderState);
   const onFinish = (values: any) => {};
   useEffect(() => {
-    if (session?.seller) {
+    if (session?.user) {
       const formValues = {
         name:
           order?.buyer?.name ||
@@ -40,7 +40,7 @@ export function MConfirmCartInfo(props: MConfirmCartInfoProps) {
       };
       props.form.setFieldsValue(formValues);
     }
-  }, [session?.seller]);
+  }, [session?.user]);
   return (
     <Form
       style={{ minWidth: 700, padding: '30px 0px' }}

@@ -78,12 +78,12 @@ export default function MSelectAddressFormItem(
       setProvinces(provinces);
       if(props.isEdit) {
         const address = props.form?.getFieldValue('address');
-        console.log(address);
-        if(address.district) {
+        
+        if(address?.district) {
           const districts = await getAddresses(address.province);
           setDistricts(districts);
         }
-        if(address.ward) {
+        if(address?.ward) {
           const wards = await getAddresses(address.district);
           setWards(wards);
         }

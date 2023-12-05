@@ -15,10 +15,16 @@ export const PRODUCT_ENDPOINT = {
   UPDATE: '/product/', // vs id
   LIST: '/product/list',
 
-
   SELLER_LIST: '/product/seller/list',
   CREATE: '/product',
   DELETE: '/product/', // vs id
+};
+export const ORDER_ENDPOINT = {
+  SELLER_LIST: '/order/seller/list',
+  BUYER_LIST: '/order/buyer/list',
+  BUYER_CANCEL_ORDER: '/order/buyer/cancel',
+  SELLER_CONFIRM_ORDER: '/order/seller/confirm',
+  SELLER_SHIPPING_CONFIRM_ORDER: '/order/seller/shipping-confirm',
 };
 export const CATEGORY_ENDPOINT = {
   LIST: '/category/list',

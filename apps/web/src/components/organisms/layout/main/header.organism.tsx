@@ -47,13 +47,10 @@ export function OGMainLayoutHeader() {
     {
       key: '5',
       label: <Link href="/seller">Gian hàng</Link>,
-      onClick: () => {
-        navigate.push('/seller');
-      },
     },
     {
       key: '2',
-      label: 'Đơn hàng',
+      label: <Link href="/order">Đơn hàng</Link>, 
     },
     {
       key: '4',

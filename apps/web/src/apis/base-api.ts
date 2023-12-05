@@ -13,10 +13,10 @@ async function baseApi<Res = any>(
 ): Promise<Res> {
   const url = process.env.NEXT_PUBLIC_BACKEND_DOMAIN + endpoint;
   
-  const local = JSON.parse(localStorage.getItem(RECOIL_KEY) || '') ?? null;
+  const local = JSON.parse(localStorage.getItem(RECOIL_KEY) as any) ?? null;
   const token = localStorage.getItem('accessToken') || null;
   const refreshToken = localStorage.getItem('refreshToken') || null;
-
+  
   try {
     let headers: any = {
       'Content-type': 'application/json; charset=UTF-8',

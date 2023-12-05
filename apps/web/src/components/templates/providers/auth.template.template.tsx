@@ -30,7 +30,7 @@ export function TLAuthGuard(props: TLAuthGuardProps) {
     }
     console.log('subscribe token_expired');
     PubSub.subscribe('token_expired', (msg, data) => {
-      updateSession(null as any);
+      updateSession({} as any);
       console.log('token_expired');
     });
   }, []);
@@ -39,6 +39,8 @@ export function TLAuthGuard(props: TLAuthGuardProps) {
       setLoading(false);
       return;
     }
+    
+    console.log('useLayoutEffect', session);
     if (!session?.user) {
       console.log('no auth redirect');
       notification.warning({
@@ -60,7 +62,7 @@ export function TLAuthGuard(props: TLAuthGuardProps) {
     }
 
     if (!session.isAuthenticated) {
-      updateSession(null as any);
+      updateSession({} as any);
       router.replace(props.authRedirect || COMMON_PAGE.SIGN_IN.PATH);
       return;
     }

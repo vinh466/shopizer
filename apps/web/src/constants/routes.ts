@@ -105,28 +105,24 @@ export const SELLER_ORDER_PAGE = {
     PATH: '/seller/order',
     TITLE: 'Seller Order',
   },
-  LIST_UNPAID: {
-    PATH: '/seller/order?type=unpaid',
-    TITLE: 'Seller Order (unpaid)',
-  },
-  LIST_TOSHIP: {
-    PATH: '/seller/order?type=toship',
+  LIST_PROCESSING: {
+    PATH: '/seller/order?list=PROCESSING',
     TITLE: 'Seller Order (toship)',
   },
   LIST_SHIPPING: {
-    PATH: '/seller/order?type=shipping',
+    PATH: '/seller/order?list=SHIPPED',
     TITLE: 'Seller Order (shipping)',
   },
   LIST_COMPLETED: {
-    PATH: '/seller/order?type=completed',
+    PATH: '/seller/order?list=DELIVERED',
     TITLE: 'Seller Order (completed)',
   },
   LIST_CANCELLED: {
-    PATH: '/seller/order?type=cancelled',
+    PATH: '/seller/order?list=CANCELED',
     TITLE: 'Seller Order (cancelled)',
   },
   LIST_RETURN_LIST: {
-    PATH: '/seller/order?type=return-list',
+    PATH: '/seller/order?list=return-list',
     TITLE: 'Seller Order (return-list)',
   },
 };

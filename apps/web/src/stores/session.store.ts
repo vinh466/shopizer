@@ -1,6 +1,7 @@
 import { persistAtom } from '@shopizer/configs/recoil-persist';
 import { DefaultValue, atom, selector, useResetRecoilState } from 'recoil';
 import { cartState } from '.';
+import { isEmpty } from 'lodash';
 
 export type SessionState = {
   accessToken: string,
@@ -28,7 +29,7 @@ export const sessionState = selector<any>({
   key: 'sessionStateSelector',
   get: ({ get }) => get(sessionStateAtom),
   set: ({ set, reset }, newValue) => {
-    if (newValue === null) {
+    if (isEmpty(newValue)) {
       set(sessionStateAtom, { ...defaultState });
       reset(cartState);
       return;

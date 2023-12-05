@@ -20,7 +20,9 @@ export const TClientProvider = ({
         <StyledJsxRegistry>
           <StyledComponentsRegistry>
             <TThemeProvider>
-              <TDevProvider>{children}</TDevProvider>
+              {/* <TDevProvider> */}
+                {children}
+                {/* </TDevProvider> */}
             </TThemeProvider>
           </StyledComponentsRegistry>
         </StyledJsxRegistry>

@@ -27,8 +27,8 @@ const SellerLayout = ({ children }: { children: React.ReactNode }) => {
             ...state,
             seller: newSellerSession,
           }));
-          setLoading(false);
         }
+        setLoading(false);
       });
     };
     getProfile();

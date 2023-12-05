@@ -13,3 +13,5 @@ export * from './buyer/home/product/home-product.organism';
 
 export * from './seller/verify/seller-verify.organism'
 export * from './order/order.organism'
+
+export * from './modals/order-detail-modal.organism'

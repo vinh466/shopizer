@@ -26,7 +26,7 @@ import { COMMON_PAGE } from '@shopizer/constants';
 import { MConfirmCartInfo } from 'src/components/molecules/cart/confirm-cart-info/confirm-cart-info.molecule';
 import { MCartPayment } from 'src/components/molecules/cart/cart-payment/cart-payment.molecule';
 import { buyerApi } from '@shopizer/apis/buyer/buyer';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 
 export default function CartPage() {
   const [cartSelected, setCartSelected] = useState<string[]>([]);
@@ -114,7 +114,7 @@ export default function CartPage() {
       });
       return;
     } else {
-      handleChangeOrder()
+      handleChangeOrder();
       setCurrentStep(currentStep + 1);
       setStep(currentStep + 1);
     }
@@ -143,42 +143,58 @@ export default function CartPage() {
         item?.cartItems?.reduce((total: number, product: any) => {
           return (
             total +
-            product?.cartVariants?.reduce((total: number, variant: any) => { 
-              console.log(total , variant?.quantity , variant?.price);
+            product?.cartVariants?.reduce((total: number, variant: any) => {
+              console.log(total, variant?.quantity, variant?.price);
               return total + (variant?.quantity || 1) * variant?.price;
             }, 0)
           );
         }, 0)
       );
-    }
-    , 0);
-  };
+    }, 0);
+  }
   function handlePayment() {
-    buyerApi.order(order).then((res) => {
-      if(!res.errorStatusCode) {
-
+    const {results, ...order2} = order;
+    buyerApi.order(order2).then((res) => {
+      if (!res.errorStatusCode) {
         notification.success({
           message: 'Đặt hàng thành công',
         });
+
+        handleRemvoeProductCart(order.itemIds);
+
+        const { buyer } = order;
         setOrderState({
-          ...order,
-          ...res,
+          buyer,
         });
         setCurrentStep(currentStep + 1);
         setStep(currentStep + 1);
       }
-    }
-    );
+    });
   }
+  function handleRemvoeProductCart(variantId: string[]) {
+    const newCart = cloneDeep(cart);
 
+    newCart.items.forEach((sellerItem: any) => {
+      sellerItem.cartItems.forEach((productItem: any) => {
+        productItem.cartVariants = productItem.cartVariants.filter(
+          (variant: any) => !variantId.includes(variant.id),
+        );
+        if(productItem.cartVariants.length === 0){
+          productItem = null;
+        }
+      });
+    });
+
+    setCart(newCart);
+  }
   useEffect(() => {
     console.log('order', order);
   }, [order]);
-  
+
   useEffect(() => {
     handleChangeOrder();
   }, [cart, cartSelected]);
-  
+
   return (
     <div>
       {cart?.items?.length > 0 ? (
@@ -210,79 +226,83 @@ export default function CartPage() {
               </div>
             )}
             {currentStep === 3 && (
-              <Result
-                status="success"
-                title="Đã mua thành công!"
-                subTitle="Mã đơn hàng: 2017182818828182881 sẽ nhanh chóng giao đến bạn, vui lòng đợi."
-                extra={[
-                  <Button type="primary" key="console">
-                    Đơn hàng
-                  </Button>,
-                  <Link key="home" href={COMMON_PAGE.HOME.PATH}>
-                    <Button key="buy">Mua thêm</Button>
-                  </Link>,
-                ]}
-              />
+              <div className="cart-paument-finished">
+                <Result
+                  status="success"
+                  title="Đã mua thành công!"
+                  subTitle="Đơn hàng sẽ nhanh chóng giao đến bạn, vui lòng đợi."
+                  extra={[
+                    <Button type="primary" key="console">
+                      Đơn hàng
+                    </Button>,
+                    <Link key="home" href={COMMON_PAGE.HOME.PATH}>
+                      <Button key="buy">Mua thêm</Button>
+                    </Link>,
+                  ]}
+                />
+              </div>
             )}
           </Col>
-          <Col span="6">
-            <Affix offsetTop={16}>
-              <div className="sticky-scroll-bar">
-                <div className="cart-summary">
-                  <div className="product-price">
-                    <div className="title">Tạm Tính</div>
-                    <div>
-                      {(getOrderTotalPrice() || 0)?.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                      })}
+          {currentStep !== 3 && (
+            <Col span="6">
+              <Affix offsetTop={16}>
+                <div className="sticky-scroll-bar">
+                  <div className="cart-summary">
+                    <div className="product-price">
+                      <div className="title">Tạm Tính</div>
+                      <div>
+                        {(getOrderTotalPrice() || 0)?.toLocaleString('vi-VN', {
+                          style: 'currency',
+                          currency: 'VND',
+                        })}
+                      </div>
                     </div>
-                  </div>
-                  <div className="cart-action">
-                    <div>
-                      {currentStep === 0 && (
-                        <Button
-                          type="primary"
-                          style={{ width: '100%' }}
-                          onClick={() => handleConfirmProduct()}
-                        >
-                          Xác nhận sản phẩm
-                        </Button>
-                      )}
+                    <div className="cart-action">
+                      <div>
+                        {currentStep === 0 && (
+                          <Button
+                            type="primary"
+                            style={{ width: '100%' }}
+                            onClick={() => handleConfirmProduct()}
+                          >
+                            Xác nhận sản phẩm
+                          </Button>
+                        )}
 
-                      {currentStep === 1 && (
-                        <Button
-                          type="primary"
-                          style={{ width: '100%' }}
-                          htmlType="submit"
-                          onClick={() => {
-                            handleVerify();
-                          }}
-                          className="login-form-button"
-                        >
-                          {'Xác nhận thông tin'}
-                        </Button>
-                      )}
+                        {currentStep === 1 && (
+                          <Button
+                            type="primary"
+                            style={{ width: '100%' }}
+                            htmlType="submit"
+                            onClick={() => {
+                              handleVerify();
+                            }}
+                            className="login-form-button"
+                          >
+                            {'Xác nhận thông tin'}
+                          </Button>
+                        )}
 
-                      {currentStep === 2 && (
-                        <Button
-                          type="primary"
-                          style={{ width: '100%' }}
-                          htmlType="submit"
-                          onClick={() => {
-                            handlePayment();
-                          }}
-                          className="login-form-button"
-                        >
-                          Thanh toán
-                        </Button>
-                      )}
+                        {currentStep === 2 && (
+                          <Button
+                            type="primary"
+                            style={{ width: '100%' }}
+                            htmlType="submit"
+                            onClick={() => {
+                              handlePayment();
+                            }}
+                            className="login-form-button"
+                          >
+                            Thanh toán
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Affix>
-          </Col>
+              </Affix>
+            </Col>
+          )}
         </Row>
       ) : (
         <div>
@@ -338,6 +358,7 @@ export default function CartPage() {
           border-radius: 6px;
           padding: 16px;
         }
+        .cart-paument-finished,
         .cart-paument-info {
           background-color: #fff;
           border-radius: 6px;

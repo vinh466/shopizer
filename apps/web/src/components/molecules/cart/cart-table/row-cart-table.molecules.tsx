@@ -11,7 +11,7 @@ import { cloneDeep, debounce, set } from 'lodash';
 interface MRowCartTableProps {
   cartItem: any;
   cartSelected: string[];
-  onSelect: (id: string[]) => void;
+  onSelect?: (id: string[]) => void;
   isConfirm?: boolean;
 }
 
@@ -32,13 +32,13 @@ export function MRowCartTable(props: MRowCartTableProps) {
     if (props.isConfirm) return;
     if (checkAll) {
       if (selected.length === cartVariants.length) {
-        props.onSelect(
+        props.onSelect?.(
           props.cartSelected.filter(
             (item) => !selected.map((i: any) => i.id).includes(item),
           ),
         );
       } else {
-        props.onSelect([
+        props.onSelect?.([
           ...props.cartSelected,
           ...cartVariants.map((item: any) => item?.id),
         ]);
@@ -47,11 +47,11 @@ export function MRowCartTable(props: MRowCartTableProps) {
     } else {
       const index = props.cartSelected.findIndex((item) => item === id);
       if (index === -1) {
-        props.onSelect([...props.cartSelected, id]);
+        props.onSelect?.([...props.cartSelected, id]);
       } else {
         const newSelected = [...props.cartSelected];
         newSelected.splice(index, 1);
-        props.onSelect(newSelected);
+        props.onSelect?.(newSelected);
       }
     }
   };

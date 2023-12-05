@@ -124,7 +124,7 @@ export function OGTabsTable(props: OGTabsTableProps) {
           </Space>
         }
         onChange={onTabChange}
-        items={props.tabs.map((tab, i) => {
+        items={props.tabs?.map((tab, i) => {
           let key = tab.tabHref || tab.tabKey || tab.tabId || String(i + 1);
           // key += String(i + 1);
           return {
@@ -139,7 +139,7 @@ export function OGTabsTable(props: OGTabsTableProps) {
               />
             ),
           };
-        })}
+        }) ||[]}
       />
       <style jsx global>{`
         .og-tabs-table-wrapper {
