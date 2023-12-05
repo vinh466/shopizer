@@ -9,9 +9,7 @@ import { Controller, Delete, Get, Patch, Post } from "@shopizer/decorators";
 import { DtoValidation } from "@shopizer/middleware";
 import { PrismaClient } from "@prisma/client";
 import { FileUploadMiddleware } from "@shopizer/middleware/file-update.middleware";
-import { MulterError } from "multer";
 import { toInteger } from "lodash";
-import { PRODUCT_STATUS } from "@shopizer/constants/product.constant";
 
 @Controller("product")
 class ProductController {
@@ -62,7 +60,7 @@ class ProductController {
   @Patch("/:id", authMiddleware, DtoValidation(UpdateProductDto))
   async modify(request: Request, response: Response, next: NextFunction) {
     const sellerId = request.user.id;
-    const id = request.params.id; 
+    const id = request.params.id;
     const productData: CreateProductDto = request.body;
     try {
       const createdProduct = await this.productService.update(id, productData, sellerId);

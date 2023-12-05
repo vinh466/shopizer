@@ -41,6 +41,7 @@ model Seller {
   pickupAddress   Address[]
   products        Product[]
   user            User         @relation(fields: [id], references: [id])
+  Order           Order[]
 }
 
 model Product {
@@ -93,8 +94,8 @@ model ProductVariant {
   updatedAt     DateTime    @updatedAt
   orderItemId   String?
   Order         Order[]
-  OrderItem     OrderItem[]
   product       Product     @relation(fields: [productId], references: [id])
+  OrderItem     OrderItem[]
 }
 
 model InOutHistory {
@@ -149,6 +150,8 @@ model Order {
   DeliveryAddress      Address?               @relation(fields: [deliveryAddressId], references: [id])
   ProductVariant       ProductVariant?        @relation(fields: [productVariantId], references: [id])
   user                 User                   @relation(fields: [userId], references: [id])
+  sellerId             String?
+  seller               Seller?                @relation(fields: [sellerId], references: [id])
   items                OrderItem[]
   OrderPromotionDetail OrderPromotionDetail[]
   OrderStatusHistory   OrderStatusHistory[]
@@ -161,8 +164,8 @@ model OrderItem {
   price            Float
   orderId          String
   status           OrderStatus    @default(PENDING)
-  productVariantId String
   order            Order          @relation(fields: [orderId], references: [id])
+  productVariantId String
   productVariants  ProductVariant @relation(fields: [productVariantId], references: [id])
 }
 

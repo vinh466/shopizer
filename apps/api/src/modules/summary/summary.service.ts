@@ -71,35 +71,44 @@ export class SummaryService {
     const orderCount = await this.prisma.order.count({
       where: {
         status: "PENDING",
-
+        sellerId
       },
     })
 
     const orderProcessingCount = await this.prisma.order.count({
       where: {
         status: "PROCESSING",
+        sellerId
+
+      },
+    })
+
+    const orderShippingCount = await this.prisma.order.count({
+      where: {
+        status: "SHIPPED",
+        sellerId
 
       },
     })
 
     const orderDoneCount = await this.prisma.order.count({
       where: {
-        status: "SHIPPED",
-
+        status: "DELIVERED",
+        sellerId
       },
     })
 
     const orderCanceledCount = await this.prisma.order.count({
       where: {
-        status: "SHIPPED",
-
+        status: "CANCELED",
+        sellerId
       },
     })
 
     const orderViolateCount = await this.prisma.product.count({
       where: {
         status: "VIOLATE",
-
+        sellerId
       },
     })
 
@@ -123,7 +132,11 @@ export class SummaryService {
         value: orderProcessingCount,
       },
       {
-        title: 'Đã Xử Lý',
+        title: 'Dang giao hàng',
+        value: orderShippingCount,
+      },
+      {
+        title: 'Đã giao',
         value: orderDoneCount,
       },
       {
@@ -157,7 +170,7 @@ export class SummaryService {
 
     const orderCanceledCount = await this.prisma.order.count({
       where: {
-        status: "SHIPPED",
+        status: "CANCELED",
 
       },
     })
@@ -173,7 +186,7 @@ export class SummaryService {
       {
         id: "1",
         criteria: "Tỉ lệ đơn không thành công ",
-        shopValue: orderCanceledCount / (orderTotalCount || 1) * 100 + "%",
+        shopValue: (orderCanceledCount / (orderTotalCount || 1) * 100).toFixed(2) + "%",
         targetValue: "<10.00%",
       },
       {
