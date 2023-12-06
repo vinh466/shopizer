@@ -88,7 +88,7 @@ class ProductService {
         },
       ];
 
-    const soldOut = productVariant.every(item => item.stock <= 0) 
+    const soldOut = productVariant.every(item => item.stock <= 0)
     console.log(productVariant);
 
     const categoryId = category.find((item) => item.isLeaf)?.value;
@@ -227,10 +227,15 @@ class ProductService {
           variation: item.variation,
         }
       })
-    })); 
+    }));
     const product = await this.prisma.product.findUnique({
       where: {
-        id
+        id,
+        Seller: {
+          status: {
+            notIn: [$Enums.SellerStatus.REJECTED, $Enums.SellerStatus.BLOCKED]
+          }
+        }
       },
     })
 
@@ -314,7 +319,11 @@ class ProductService {
     const query: Prisma.SellerFindManyArgs = {
       skip: (currentPage - 1) * pageSize,
       take: pageSize,
-      where: {},
+      where: {
+        status: {
+          notIn: [$Enums.SellerStatus.REJECTED, $Enums.SellerStatus.BLOCKED]
+        }
+      },
       include: {
         products: true,
         user: true,
@@ -352,9 +361,15 @@ class ProductService {
         ProductVariant: true,
         Seller: true,
         Auction: true,
-        Category: true, 
+        Category: true,
       },
-      where: {},
+      where: {
+        Seller: {
+          status: {
+            notIn: [$Enums.SellerStatus.REJECTED, $Enums.SellerStatus.BLOCKED]
+          }
+        }
+      },
     };
     const [results, count] = await prisma.$transaction([
       this.prisma.product.findMany(query),
@@ -409,6 +424,9 @@ class ProductService {
               equals: $Enums.ProductStatus.ACTIVE
             }
           }
+        },
+        status: {
+          notIn: [$Enums.SellerStatus.REJECTED, $Enums.SellerStatus.BLOCKED]
         },
         addNewProductAt: {
           not: null
@@ -485,7 +503,14 @@ class ProductService {
 
   public async findById(id: string) {
     return this.prisma.product.findUnique({
-      where: { id },
+      where: {
+        id,
+        Seller: {
+          status: {
+            notIn: [$Enums.SellerStatus.REJECTED, $Enums.SellerStatus.BLOCKED]
+          }
+        }
+      },
       include: {
         Seller: true,
         ProductVariant: true,

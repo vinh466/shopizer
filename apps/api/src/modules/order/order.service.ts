@@ -6,7 +6,22 @@ class OrderService {
 
   async createOrder(payload: any) {
     const { orderItems, buyer } = payload
+    orderItems.map(async (item: any) => {
+      const { seller, cartItems } = item
+      const variantItems = cartItems.reduce((acc: any, orderItem: any,) => {
+        const { cartVariants } = orderItem
+        cartVariants.forEach((variant: any) => {
+          acc.push({
+            productVariantId: variant?.id,
+            quantity: variant?.quantity || 1,
+            price: variant?.price || 10000,
+          })
+        })
+        return acc
+      }, [])
 
+      console.log(variantItems)
+    })
 
     const results = await prisma.$transaction(
       orderItems.map((item: any) => {
@@ -94,7 +109,18 @@ class OrderService {
       take: pageSize,
       include: {
         items: true,
-        seller: true,
+        seller: {
+          include: {
+            pickupAddress: {
+              include: {
+                district: true,
+                province: true,
+                ward: true,
+              }
+            },
+
+          }
+        },
         user: true,
         DeliveryAddress: {
           include: {
@@ -120,7 +146,16 @@ class OrderService {
       results,
     };
   }
-
+  async buyerCancelOrder(id: string) {
+    return this.prisma.order.update({
+      where: {
+        id
+      },
+      data: {
+        status: 'CANCELED'
+      }
+    })
+  }
 
   async getBuyerOrderList(
     {
@@ -150,7 +185,18 @@ class OrderService {
       take: pageSize,
       include: {
         items: true,
-        seller: true,
+        seller: {
+          include: {
+            pickupAddress: {
+              include: {
+                district: true,
+                province: true,
+                ward: true,
+              }
+            },
+
+          }
+        },
         user: true,
         DeliveryAddress: {
           include: {
@@ -188,12 +234,50 @@ class OrderService {
   }
 
   async sellerShippingConfirmOrder(orderId: string) {
-    return this.prisma.order.update({
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId
+      },
+      include: {
+        items: true
+      }
+    })
+    const items = order?.items || []
+    items.map(async (item: any) => {
+      const variant = await this.prisma.productVariant.findUnique({
+        where: {
+          id: item?.productVariantId
+        }
+      })
+      if (variant?.stock) {
+        await this.prisma.productVariant.update({
+          where: {
+            id: item?.productVariantId
+          },
+          data: {
+            stock: variant?.stock - item?.quantity
+          }
+        })
+      }
+    })
+    const result = await this.prisma.order.update({
       where: {
         id: orderId
       },
       data: {
         status: 'SHIPPED'
+      }
+    })
+    return { result, order }
+  }
+
+  async buyerReceivedOrder(orderId: string) {
+    return this.prisma.order.update({
+      where: {
+        id: orderId
+      },
+      data: {
+        status: 'DELIVERED'
       }
     })
   }

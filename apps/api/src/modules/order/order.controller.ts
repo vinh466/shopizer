@@ -87,4 +87,35 @@ export class OrderController {
       });
     }
   }
+  @Patch("buyer/cancel", authMiddleware)
+  async buyerCancelOrder(request: Request, response: Response) {
+    try {
+      const orderId = request.body.id;
+      const result = await this.orderService.buyerCancelOrder(orderId);
+      response.json({
+        message: "Hủy đơn hàng thành công",
+        result
+      });
+    } catch (error) {
+      response.status(400).json({
+        message: "Hủy đơn hàng không thành công, vui lòng thử lại sau.",
+      });
+    }
+  }
+  @Patch("buyer/received", authMiddleware)
+  async buyerReceivedOrder(request: Request, response: Response) {
+    try {
+      const orderId = request.body.id;
+      const result = await this.orderService.buyerReceivedOrder(orderId);
+      response.json({
+        message: "Đã nhận hàng",
+        result
+      });
+    } catch (error) {
+      response.status(400).json({
+        message: "Không thành công, vui lòng thử lại sau.",
+      });
+    }
+  }
+
 }

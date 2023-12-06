@@ -8,9 +8,11 @@ import { OrderController } from "./modules/order/order.controller";
 import { ProductCategoryController } from "./modules/product-category/product-category.controller";
 import { SummaryController } from "./modules/summary/summary.controller";
 import { ProvincesController } from "./modules/provinces/provinces.controller";
+import { AdminController } from "./modules/admin/admin.controller";
 
 validateEnv();
 const app = new App([
+  AdminController,
   OrderController,
   AuthenticationController,
   UserController,

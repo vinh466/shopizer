@@ -32,7 +32,13 @@ class UserService {
   public async create(data: CreateUserDto) {
     return await this.prisma.user.create({ data });
   }
-
+  async findAdminById(id: string) {
+    return await this.prisma.admin.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
   async findSellerById(id: string) {
     return await this.prisma.user.findUnique({
       where: {

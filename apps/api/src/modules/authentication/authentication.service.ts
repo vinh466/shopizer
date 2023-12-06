@@ -73,7 +73,11 @@ class AuthenticationService {
   public async sellerVerify(verifyData: any) {
     const seller = await this.prisma.seller.findFirst({ where: { id: verifyData.userId } })
     console.log("seller", seller)
-    if (seller) throw new SellerHasBeenVerifiedException()
+    if (seller && seller.status !== 'REJECTED') throw new SellerHasBeenVerifiedException()
+    if (seller && seller.status === 'REJECTED') {
+      await this.prisma.seller.delete({ where: { id: verifyData.userId } })
+    }
+
     const result = await this.prisma.seller.create({
       data: {
         name: verifyData.shopName,

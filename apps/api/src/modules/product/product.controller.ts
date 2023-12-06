@@ -10,6 +10,7 @@ import { DtoValidation } from "@shopizer/middleware";
 import { PrismaClient } from "@prisma/client";
 import { FileUploadMiddleware } from "@shopizer/middleware/file-update.middleware";
 import { toInteger } from "lodash";
+import ProductCannotDeleteFoundException from "./exceptions/ProductCannotDeleteException";
 
 @Controller("product")
 class ProductController {
@@ -90,13 +91,17 @@ class ProductController {
   }
   @Delete("/:id", authMiddleware)
   async delete(request: Request, response: Response, next: NextFunction) {
-    const id = request.params.id;
-    console.log(id)
-    const successResponse = await this.productService.findByIdAndDelete(id);
-    if (successResponse) {
-      response.send(200);
-    } else {
-      next(new ProductNotFoundException(id));
+    try {
+      const id = request.params.id;
+      console.log(id)
+      const successResponse = await this.productService.findByIdAndDelete(id);
+      if (successResponse) {
+        response.send(200);
+      } else {
+        next(new ProductNotFoundException(id));
+      }
+    } catch (error) {
+      next(new ProductCannotDeleteFoundException());
     }
   }
 

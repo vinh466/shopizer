@@ -29,6 +29,21 @@ class UserController {
     }
   }
 
+  @Get("/admin/profile", authMiddleware)
+  async getAdminById(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = request.user.id;
+      const user = await this.userServices.findAdminById(id);
+
+      if (user) {
+        response.send(user);
+      } else {
+        next(new UserNotFoundException(id));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
   @Get("/seller/profile", authMiddleware)
   async getSellerById(request: Request, response: Response, next: NextFunction) {
     try {
