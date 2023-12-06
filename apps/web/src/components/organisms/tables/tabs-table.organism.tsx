@@ -27,6 +27,7 @@ interface TabTableData<TableRecordType = any> {
   tableCol: ColumnsType<TableRecordType>;
   apiEndpoint?: string;
   baseQuery?: string;
+  isAdminApi?: boolean;
 }
 
 /**
@@ -135,6 +136,7 @@ export function OGTabsTable(props: OGTabsTableProps) {
                 key={key}
                 columns={tab.tableCol}
                 apiEndpoint={tab.apiEndpoint}
+                isAdminApi={tab.isAdminApi}
                 baseQuery={tab.baseQuery || ''}
               />
             ),

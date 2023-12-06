@@ -8,7 +8,7 @@ interface ConfirmOrderButtonProps {
   orderId: string;
   danger?: boolean;
   children: React.ReactNode;
-  type?: 'PENDING' | 'PROCESSING' | 'BUYER_CANCELLED';
+  type?: 'PENDING' | 'PROCESSING' | 'BUYER_CANCELLED' | 'BUYER_RECEIVED';
 }
 
 export function ConfirmOrderButton(props: ConfirmOrderButtonProps) {
@@ -50,6 +50,19 @@ export function ConfirmOrderButton(props: ConfirmOrderButtonProps) {
           if (!err.errorStatusCode) {
             notification.success({
               message: 'Hủy đơn hàng thành công',
+            });
+          }
+          setLoadingq(false);
+        });
+    } else if (props.type === 'BUYER_RECEIVED') {
+      sellerOrderApi
+        .received({
+          id: props.orderId,
+        })
+        .then((err) => {
+          if (!err.errorStatusCode) {
+            notification.success({
+              message: 'Đã xác nhận đơn hàng',
             });
           }
           setLoadingq(false);

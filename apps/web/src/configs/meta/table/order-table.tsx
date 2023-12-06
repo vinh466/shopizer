@@ -129,8 +129,22 @@ const getOrderColumns = (type: 'seller' | 'buyer' = 'seller', allOrder = false) 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
             {type === 'buyer' &&
               ['PROCESSING', 'PENDING']?.includes(status) && (
-                <ConfirmOrderButton orderId={id} type={status} danger>
+                <ConfirmOrderButton
+                  orderId={id}
+                  type={'BUYER_CANCELLED'}
+                  danger
+                >
                   Hủy
+                </ConfirmOrderButton>
+              )}
+            {type === 'buyer' &&
+              ['SHIPPED']?.includes(status) && (
+                <ConfirmOrderButton
+                  orderId={id}
+                  type={'BUYER_RECEIVED'}
+                  
+                >
+                  Đã nhận hàng
                 </ConfirmOrderButton>
               )}
             <OGSellerOrderDetailModal order={order}>

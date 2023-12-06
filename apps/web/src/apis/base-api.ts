@@ -10,11 +10,12 @@ async function baseApi<Res = any>(
   endpoint: string,
   body = {},
   method: Method = 'GET',
+  app: 'admin' | 'buyer' | 'seller' = 'buyer',
 ): Promise<Res> {
   const url = process.env.NEXT_PUBLIC_BACKEND_DOMAIN + endpoint;
   
   const local = JSON.parse(localStorage.getItem(RECOIL_KEY) as any) ?? null;
-  const token = localStorage.getItem('accessToken') || null;
+  const token = app === 'admin' ? local?.adminSessionState?.accessToken : localStorage.getItem('accessToken') || null;
   const refreshToken = localStorage.getItem('refreshToken') || null;
   
   try {

@@ -27,7 +27,7 @@ const headerStyle: React.CSSProperties = {
   minHeight: 64,
   height: 'fit-content',
   lineHeight: '20px',
-  padding: 0, 
+  padding: 0,
 };
 
 const { Search } = Input;
@@ -40,17 +40,20 @@ export function OGMainLayoutHeader() {
   };
 
   const items: MenuProps['items'] = [
-    {
-      key: '1',
-      label: 'Tài khoản',
-    },
+    // {
+    //   key: '1',
+    //   label: 'Tài khoản',
+    // },
     {
       key: '5',
       label: <Link href="/seller">Gian hàng</Link>,
+      style: {
+        minWidth: '140px',
+      },
     },
     {
       key: '2',
-      label: <Link href="/order">Đơn hàng</Link>, 
+      label: <Link href="/order">Đơn hàng</Link>,
     },
     {
       key: '4',
@@ -62,8 +65,8 @@ export function OGMainLayoutHeader() {
   ];
 
   useEffect(() => {
-    console.log("Cart Change", cart);
-  },[cart])
+    console.log('Cart Change', cart);
+  }, [cart]);
   return (
     <Header style={headerStyle} className="header">
       <TContainer>

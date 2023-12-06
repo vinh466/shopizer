@@ -71,6 +71,7 @@ export default function CartPage() {
     }
     newSteps[index].status = 'process';
     setPaymentSteps(newSteps);
+    setCurrentStep(index);
   };
   function handleChangeOrder() {
     const orderItems = cart.items
@@ -107,6 +108,7 @@ export default function CartPage() {
       cart,
     });
   }
+
   function handleConfirmProduct() {
     if (cartSelected.length === 0) {
       notification.error({
@@ -135,6 +137,7 @@ export default function CartPage() {
       setStep(currentStep + 1);
     });
   }
+
   function getOrderTotalPrice() {
     console.log(order);
     return order?.orderItems?.reduce((total: number, item: any) => {
@@ -152,8 +155,9 @@ export default function CartPage() {
       );
     }, 0);
   }
+
   function handlePayment() {
-    const {results, ...order2} = order;
+    const { results, ...order2 } = order;
     buyerApi.order(order2).then((res) => {
       if (!res.errorStatusCode) {
         notification.success({
@@ -174,16 +178,23 @@ export default function CartPage() {
   function handleRemvoeProductCart(variantId: string[]) {
     const newCart = cloneDeep(cart);
 
-    newCart.items.forEach((sellerItem: any) => {
-      sellerItem.cartItems.forEach((productItem: any) => {
+    newCart.items.forEach((sellerItem: any, cartItemIndex: number) => {
+      sellerItem.cartItems.forEach((productItem: any, index: number) => {
         productItem.cartVariants = productItem.cartVariants.filter(
           (variant: any) => !variantId.includes(variant.id),
         );
-        if(productItem.cartVariants.length === 0){
-          productItem = null;
+        if (productItem.cartVariants.length === 0) {
+          sellerItem.cartItems[index] = null;
         }
       });
+      sellerItem.cartItems = sellerItem.cartItems.filter(
+        (item: any) => item !== null,
+      );
+      if (sellerItem.cartItems.length === 0) {
+        newCart.items[cartItemIndex] = null;
+      }
     });
+    newCart.items = newCart.items.filter((item: any) => item !== null);
 
     setCart(newCart);
   }
@@ -232,12 +243,16 @@ export default function CartPage() {
                   title="Đã mua thành công!"
                   subTitle="Đơn hàng sẽ nhanh chóng giao đến bạn, vui lòng đợi."
                   extra={[
-                    <Button type="primary" key="console">
-                      Đơn hàng
-                    </Button>,
-                    <Link key="home" href={COMMON_PAGE.HOME.PATH}>
-                      <Button key="buy">Mua thêm</Button>
+                    <Link key="order" href={COMMON_PAGE.ORDER.PATH}>
+                      <Button key="order" type="primary">
+                        Đơn hàng
+                      </Button>
                     </Link>,
+                    // <Link key="home" href={COMMON_PAGE.HOME.PATH}>
+                    <Button key="buy" onClick={() => setStep(0)}>
+                      Mua thêm
+                    </Button>,
+                    // </Link>,
                   ]}
                 />
               </div>

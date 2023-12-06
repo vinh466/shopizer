@@ -26,14 +26,6 @@ export function MOrderProductPreview(props: MOrderProductPreviewProps) {
             )
             ?.cartItems?.reduce((a: any, c: any) => {
               a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
-              a.push(c);
               return a;
             }, [])
             ?.map((cartItem: any, index: number) => {

@@ -1,5 +1,6 @@
 'use client';
 
+import { adminApi } from '@shopizer/apis/admin/admin';
 import { sellerApi } from '@shopizer/apis/seller/seller';
 import { ASpinLoadingPage } from '@shopizer/atoms';
 import {
@@ -20,12 +21,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   useLayoutEffect(() => {
     const getProfile = () => {
-      sellerApi.getProfile().then((res: any) => {
+      adminApi.getProfile().then((res: any) => {
         if (res.errorStatusCode) {
         } else {
           updateSession((state: any) => ({
             ...state,
-            seller: res.seller,
+            admin: res,
           }));
           setLoading(false);
         }

@@ -43,7 +43,7 @@ export function MSellerVerifyForm(props: MSellerVerifyFormProps) {
           },
         ],
         shopName: session?.seller?.name,
-        email: session?.seller?.email,
+        email: session?.seller?.email || session?.user?.email,
         phone: session?.seller?.pickupAddress?.[0]?.phone,
         address: {
           province: session?.seller?.pickupAddress?.[0]?.provinceCode,
@@ -54,8 +54,7 @@ export function MSellerVerifyForm(props: MSellerVerifyFormProps) {
       };
       f.setFieldsValue(formValues);
     }
-  }
-  , [session?.seller]);
+  }, [session?.seller, session?.user]);
   return (
     <Form
       style={{ minWidth: 700, padding: '30px 0px' }}

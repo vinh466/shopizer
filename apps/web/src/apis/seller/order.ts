@@ -10,6 +10,9 @@ async function shipping(payload: any) {
 async function cancel(payload: any) {
     return await baseApi(ORDER_ENDPOINT.BUYER_CANCEL_ORDER, payload, 'PATCH');
 }
+async function received(payload: any) {
+    return await baseApi(ORDER_ENDPOINT.BUYER_RECEIVED_ORDER, payload, 'PATCH');
+}
 export const sellerOrderApi = {
-    confirm, shipping, cancel
+    confirm, shipping, cancel, received
 };

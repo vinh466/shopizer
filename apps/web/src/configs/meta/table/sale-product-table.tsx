@@ -88,13 +88,13 @@ const productTable: ColumnsType<{
       return getStock(value);
     },
   },
-  {
-    key: 'salesCount',
-    title: 'Doanh số',
-    sorter: true,
-    dataIndex: 'salesCount',
-    width: '12%',
-  },
+  // {
+  //   key: 'salesCount',
+  //   title: 'Doanh số',
+  //   sorter: true,
+  //   dataIndex: 'salesCount',
+  //   width: '12%',
+  // },
   {
     key: '123',
     title: '',

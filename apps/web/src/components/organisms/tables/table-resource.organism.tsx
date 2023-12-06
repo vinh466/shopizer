@@ -9,6 +9,7 @@ interface OGTableResourceProps {
   columns: any;
   apiEndpoint?: string;
   baseQuery?: string;
+  isAdminApi?: boolean;
 }
 export function OGTableResource(props: OGTableResourceProps) {
   const [mounted, setMounted] = useState(false);
@@ -28,7 +29,7 @@ export function OGTableResource(props: OGTableResourceProps) {
   const { data, mutate } = useSWR(
     mounted && query && url ? [cacheKey, url + query] : null,
     ([key, url]) => {
-      return fetcher(url);
+      return fetcher(url, {}, 'GET', props.isAdminApi ? 'admin' : 'buyer');
     },
   );
 
@@ -61,7 +62,7 @@ export function OGTableResource(props: OGTableResourceProps) {
   useEffect(() => {
     const sub = PubSub.subscribe('reload_table', (msg, data) => {
       console.log('reload_table');
-      mutate();
+      setTimeout(() => mutate(), 100);
     });
     return () => {
       PubSub.unsubscribe(sub);

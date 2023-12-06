@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import { usePathname, useRouter } from 'next/navigation';
 import {
+  ADMIN_PAGE,
   SELLER_PAGE,
   SELLER_SHOP_PAGE,
 } from '@shopizer/constants';
@@ -21,7 +22,6 @@ import { adminSessionState } from 'src/stores/admin-session.store';
 const { Content, Header, Sider } = Layout;
 
 export function TAdminLayout({ children }: { children: React.ReactNode }) {
-  const [session, updateSession] = useRecoilState(sessionState);
   const [adminSession, updateAdminSession] = useRecoilState(adminSessionState);
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -32,7 +32,7 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
       key: '4',
       label: 'Đăng xuất',
       onClick: () => {
-        updateSession(null);
+        updateAdminSession(null);
       },
     },
   ];
@@ -84,27 +84,8 @@ export function TAdminLayout({ children }: { children: React.ReactNode }) {
               {
                 key: SELLER_PAGE.DASHBOARD.PATH,
                 icon: <UserOutlined />,
-                onClick: () => router.push(SELLER_PAGE.DASHBOARD.PATH),
-                label: 'Dashboard',
-              },
-              {
-                key: SELLER_PAGE.DASHBOARD.PATH,
-                icon: <UserOutlined />, 
+                onClick: () => router.push(ADMIN_PAGE.DASHBOARD.PATH),
                 label: 'Quản lý người bán',
-                children: [
-                  {
-                    key: SELLER_SHOP_PAGE.PROFILE.PATH,
-                    icon: <UserOutlined />,
-                    onClick: () => router.push(SELLER_SHOP_PAGE.PROFILE.PATH),
-                    label: 'Duyệt người bán',
-                  },
-                  {
-                    key: SELLER_SHOP_PAGE.RATING.PATH,
-                    icon: <UserOutlined />,
-                    onClick: () => router.push(SELLER_SHOP_PAGE.RATING.PATH),
-                    label: 'Khóa người bán',
-                  },
-                ],
               },
             ]}
           />

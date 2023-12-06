@@ -30,6 +30,7 @@ export function TLAuthGuard(props: TLAuthGuardProps) {
     }
     console.log('subscribe token_expired');
     PubSub.subscribe('token_expired', (msg, data) => {
+      console.log(session);
       updateSession({} as any);
       console.log('token_expired');
     });

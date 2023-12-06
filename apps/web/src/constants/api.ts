@@ -5,6 +5,11 @@ export const AUTH_ENDPOINT = {
   SIGN_UP: '/auth/sign-up',
   SIGN_OUT: '/auth/sign-out',
 };
+export const ADMIN_ENDPOINT = {
+  PROFILE: '/user/admin/profile',
+  CHANGGE_SELLER_STATUS: '/admin/seller/change-status',
+  SELLER_LIST: '/admin/seller/list',
+};
 export const BUYER_ENDPOINT = {
   // VERIFY: '/auth/buyer/verify',
   // PROFILE: '/user/buyer/profile',
@@ -24,6 +29,7 @@ export const ORDER_ENDPOINT = {
   BUYER_LIST: '/order/buyer/list',
   BUYER_CANCEL_ORDER: '/order/buyer/cancel',
   SELLER_CONFIRM_ORDER: '/order/seller/confirm',
+  BUYER_RECEIVED_ORDER: '/order/buyer/received',
   SELLER_SHIPPING_CONFIRM_ORDER: '/order/seller/shipping-confirm',
 };
 export const CATEGORY_ENDPOINT = {

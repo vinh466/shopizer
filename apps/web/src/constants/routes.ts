@@ -7,6 +7,10 @@ export const COMMON_PAGE = {
     PATH: '/cart',
     TITLE: 'Cart',
   },
+  ORDER: {
+    PATH: '/order',
+    TITLE: 'Cart',
+  },
   SIGN_IN: {
     PATH: '/auth/buyer/sign-in',
     TITLE: 'Sign In',

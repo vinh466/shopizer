@@ -1,5 +1,5 @@
 'use client';
-import { COMMON_PAGE, SELLER_PAGE } from '@shopizer/constants';
+import { ADMIN_PAGE, COMMON_PAGE, SELLER_PAGE } from '@shopizer/constants';
 import { SessionState, sessionState } from '@shopizer/stores';
 import { Spin, notification } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
@@ -30,6 +30,9 @@ export function TLAdminAuthGuard(props: TLAuthGuardProps) {
     }
     console.log('subscribe token_expired');
     PubSub.subscribe('token_expired', (msg, data) => {
+      if (!session.admin) {
+        router.replace(props.authRedirect || ADMIN_PAGE.SIGN_IN.PATH);
+      }
       updateSession(null as any);
       console.log('token_expired');
     });
@@ -39,6 +42,7 @@ export function TLAdminAuthGuard(props: TLAuthGuardProps) {
       setLoading(false);
       return;
     }
+    console.log(session);
     if (!session?.admin) {
       console.log('no auth redirect');
       notification.warning({
