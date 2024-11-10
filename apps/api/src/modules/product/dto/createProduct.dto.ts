@@ -1,25 +1,58 @@
 import { Type } from "class-transformer";
 import {
+  ArrayNotEmpty,
   IsArray,
+  IsBoolean,
   IsDate,
+  IsEmpty,
   IsInt,
   IsNotEmpty,
   IsNotEmptyObject,
+  IsNumber,
+  IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from "class-validator";
-
-class Test {
+class ImageDto {
   @IsString()
-  public name: string;
+  uid
+  @IsString()
+  name
+  @IsString()
+  status
+  @IsString()
+  url
 }
-class BatchDto {
-  @IsDate()
-  @Type(() => Date)
-  public expirationDate: Date;
-
-  @IsInt()
-  public stock: number;
+class DetailList {
+  @IsString()
+  title
+  @IsString()
+  value
+}
+class CategoryDto {
+  @IsString()
+  value
+  @IsString()
+  label
+  @IsBoolean()
+  isLeaf
+}
+export class ModelList {
+  @IsNumber()
+  price
+  @IsNumber()
+  stock
+  @IsString()
+  variantId
+}
+export class TierVariation {
+  @IsString()
+  name
+  // @IsArray()
+  // options
+  @ArrayNotEmpty()
+  public options: string[];
 }
 
 class CreateProductDto {
@@ -31,21 +64,38 @@ class CreateProductDto {
   public description: string;
 
   @IsInt()
+  @IsOptional()
   public price: number;
 
+  @IsInt()
+  @IsOptional()
+  public stock: number;
+
+  @ArrayNotEmpty()
+  public productImage: ImageDto[];
+
+
+  @Type(() => DetailList)
+  public detailList: DetailList[];
+
+
+  @Type(() => ImageDto)
+  public productImageDesc: ImageDto[];
+
+  @ArrayNotEmpty()
+  @Type(() => CategoryDto)
+  public category: CategoryDto[];
+
+  @Type(() => ModelList)
+  public modelList: ModelList[];
+
+  @Type(() => TierVariation)
+  public tierVariation: TierVariation[];
+
+
   @IsString()
-  public image: string;
-
-  @IsNotEmptyObject()
-  @Type(() => BatchDto)
-  @ValidateNested()
-  public batches: BatchDto;
-
-  @IsNotEmpty()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Test)
-  public attributes: Test[];
+  @IsOptional()
+  public productVariantId: string;
 }
 
 export default CreateProductDto;

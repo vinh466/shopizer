@@ -1,311 +1,412 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id        String   @id @default(value: uuid())
-    email     String   @unique
-    password  String
-    firstName String?
-    lastName  String?
-    address   String?
-    phone     String?
-    createdAt DateTime @default(now())
-
-    orders               Order[]
-    auctions             Auction[]
-    addresses            Address[]
-    paymentMethodDetails PaymentMethodDetail[]
+  id                   String                @id @default(uuid())
+  email                String                @unique
+  password             String
+  firstName            String?
+  lastName             String?
+  createdAt            DateTime              @default(now())
+  deliveryAddresses    Address[]
+  auctions             Auction[]
+  orders               Order[]
+  paymentMethodDetails PaymentMethodDetail[]
+  seller               Seller?
 }
 
-model Store {
-    id          String  @id @default(uuid())
-    name        String
-    description String?
-    address     String?
-    phone       String?
+model Admin {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Seller {
+  id              String       @id
+  name            String
+  description     String?
+  image           String?
+  status          SellerStatus @default(PENDING)
+  addNewProductAt DateTime?
+  pickupAddress   Address[]
+  products        Product[]
+  user            User         @relation(fields: [id], references: [id])
+  Order           Order[]
 }
 
 model Product {
-    id          String  @id @default(uuid())
-    name        String
-    description String?
-    price       Float
-    image       String?
-    batches     Batch[]
-
-    categoryId String?
-    OrderItem  OrderItem[]
-    Category   Category?   @relation(fields: [categoryId], references: [id])
-    Comment    Comment[]
-    auctionId  String?
-    Auction    Auction[]   @relation("AuctionToProduct")
-
-    inOutHistories InOutHistory[]
-    ProductVariant ProductVariant[]
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  price           Float?
+  image           String?
+  categoryId      String?
+  auctionId       String?
+  imageDesc       String[]
+  stock           Int?
+  sellerId        String?
+  detailList      Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  status          ProductStatus    @default(ACTIVE)
+  variationConfig Json?
+  batches         Batch[]
+  Comment         Comment[]
+  inOutHistories  InOutHistory[]
+  Category        Category?        @relation(fields: [categoryId], references: [id])
+  Seller          Seller?          @relation(fields: [sellerId], references: [id])
+  ProductVariant  ProductVariant[]
+  Auction         Auction[]        @relation("AuctionToProduct")
 }
 
 model Category {
-    id          String  @id @default(uuid())
-    name        String
-    displayName String
-    isProhibit  Boolean @default(false)
-    description String?
-    image       String?
-
-    parentId String?
-    parent   Category?  @relation("ChildCategory", fields: [parentId], references: [id])
-    children Category[] @relation("ChildCategory")
-    products Product[]
+  id          String     @id @default(uuid())
+  name        String
+  displayName String
+  description String?
+  image       String?
+  parentId    String?
+  isProhibit  Boolean    @default(false)
+  parent      Category?  @relation("ChildCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("ChildCategory")
+  products    Product[]
 }
 
-// model ProductAttribute {
-//     id    String @id @default(uuid())
-//     name  String
-//     value String
-
-//     productId String
-//     product   ProductVariant @relation(fields: [productId], references: [id])
-// }
-
 model ProductVariant {
-    id         String   @id @default(uuid())
-    product    Product  @relation(fields: [productId], references: [id])
-    productId  String
-    sku        String?  @unique
-    stock      Int
-    price      Float
-    attributes Json
-    // attributes ProductAttribute[]
-    createdAt  DateTime @default(now())
-    orders     Order[]  @relation("ProductVariantOrder")
+  id            String      @id @default(uuid())
+  productId     String
+  sku           String?     @unique
+  stock         Int
+  price         Float
+  createdAt     DateTime    @default(now())
+  variation     Json
+  variationName String?
+  updatedAt     DateTime    @updatedAt
+  orderItemId   String?
+  Order         Order[]
+  product       Product     @relation(fields: [productId], references: [id])
+  OrderItem     OrderItem[]
 }
 
 model InOutHistory {
-    id        String   @id @default(uuid())
-    inOutType String
-    amount    Int
-    createdAt DateTime @default(now())
-
-    productId String
-    product   Product @relation(fields: [productId], references: [id])
-    Batch     Batch?  @relation(fields: [batchId], references: [id])
-    batchId   String?
-    order     Order?  @relation(fields: [orderId], references: [id])
-    orderId   String?
+  id        String   @id @default(uuid())
+  inOutType String
+  amount    Int
+  createdAt DateTime @default(now())
+  productId String
+  batchId   String?
+  orderId   String?
+  Batch     Batch?   @relation(fields: [batchId], references: [id])
+  order     Order?   @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model Batch {
-    id             String          @id @default(uuid())
-    product        Product         @relation(fields: [productId], references: [id])
-    productId      String
-    expirationDate DateTime
-    stock          Int
-    inOutHistories InOutHistory[]
-    ReturnedBatch  BatchReturned[]
+  id             String          @id @default(uuid())
+  productId      String
+  expirationDate DateTime
+  stock          Int
+  product        Product         @relation(fields: [productId], references: [id])
+  ReturnedBatch  BatchReturned[]
+  inOutHistories InOutHistory[]
 }
 
 model BatchReturned {
-    id        String   @id @default(uuid())
-    batch     Batch    @relation(fields: [batchId], references: [id])
-    batchId   String
-    amount    Int
-    reason    String?
-    createdAt DateTime @default(now())
-}
-
-enum InOutType {
-    IN
-    OUT
+  id        String   @id @default(uuid())
+  batchId   String
+  amount    Int
+  reason    String?
+  createdAt DateTime @default(now())
+  batch     Batch    @relation(fields: [batchId], references: [id])
 }
 
 model Order {
-    id                   String      @id @default(uuid())
-    createdAt            DateTime    @default(now())
-    status               OrderStatus @default(PENDING)
-    shippingCost         Float
-    totalAmount          Float
-    paymentMethod        String
-    shippingAddress      String
-    returnReason         String?
-    returnApprovalStatus String?     @default("PENDING") //"APPROVED", "REJECTED"
-    discountAmount       Float?
-
-    userId               String
-    deliveryAddressId    String?
-    items                OrderItem[]
-    user                 User                   @relation(fields: [userId], references: [id])
-    products             ProductVariant[]       @relation("ProductVariantOrder")
-    InOutHistory         InOutHistory[]
-    PaymentTransaction   PaymentTransaction[]
-    DeliveryAddress      Address?               @relation(fields: [deliveryAddressId], references: [id])
-    OrderStatusHistory   OrderStatusHistory[]
-    OrderPromotionDetail OrderPromotionDetail[]
+  id                   String                 @id @default(uuid())
+  createdAt            DateTime               @default(now())
+  status               OrderStatus            @default(PENDING)
+  shippingCost         Float
+  totalAmount          Float
+  paymentMethod        String
+  shippingAddress      String
+  returnReason         String?
+  returnApprovalStatus String?                @default("PENDING")
+  discountAmount       Float?
+  userId               String
+  deliveryAddressId    String?
+  updatedAt            DateTime               @updatedAt
+  productVariantId     String?
+  orderItemsJson       Json?
+  InOutHistory         InOutHistory[]
+  DeliveryAddress      Address?               @relation(fields: [deliveryAddressId], references: [id])
+  ProductVariant       ProductVariant?        @relation(fields: [productVariantId], references: [id])
+  user                 User                   @relation(fields: [userId], references: [id])
+  sellerId             String?
+  seller               Seller?                @relation(fields: [sellerId], references: [id])
+  items                OrderItem[]
+  OrderPromotionDetail OrderPromotionDetail[]
+  OrderStatusHistory   OrderStatusHistory[]
+  PaymentTransaction   PaymentTransaction[]
 }
 
 model OrderItem {
-    id           String  @id @default(uuid())
-    quantity     Int
-    price        Float
-    returnStatus String? @default("PENDING") // "RETURN_REQUESTED", "RETURNED".
-
-    productId String
-    orderId   String
-    order     Order   @relation(fields: [orderId], references: [id])
-    product   Product @relation(fields: [productId], references: [id])
+  id               String         @id @default(uuid())
+  quantity         Int
+  price            Float
+  orderId          String
+  status           OrderStatus    @default(PENDING)
+  order            Order          @relation(fields: [orderId], references: [id])
+  productVariantId String
+  productVariants  ProductVariant @relation(fields: [productVariantId], references: [id])
 }
 
 model OrderStatusHistory {
-    id          String      @id @default(uuid())
-    reason      String?
-    order       Order       @relation(fields: [orderId], references: [id])
-    orderId     String
-    orderStatus OrderStatus
-    dateTime    DateTime    @default(now())
-}
-
-enum OrderStatus {
-    CREATED
-    PENDING
-    PROCESSING
-    SHIPPED
-    DELIVERED
-    CANCELED
+  id          String      @id @default(uuid())
+  reason      String?
+  orderId     String
+  orderStatus OrderStatus
+  dateTime    DateTime    @default(now())
+  order       Order       @relation(fields: [orderId], references: [id])
 }
 
 model Address {
-    id          String  @id @default(uuid())
-    recipient   String
-    phoneNumber String?
-    street      String
-    city        String
-    state       String
-    country     String
-    zipCode     String
-    user        User    @relation(fields: [userId], references: [id])
-    userId      String
-    orders      Order[]
+  id           String     @id @default(uuid())
+  country      String     @default("vietnam")
+  userId       String?
+  phone        String?
+  sellerId     String?
+  detail       String
+  districtCode String?    @db.VarChar(20)
+  provinceCode String?    @db.VarChar(20)
+  wardCode     String?    @db.VarChar(20)
+  district     Districts? @relation(fields: [districtCode], references: [code])
+  province     Provinces? @relation(fields: [provinceCode], references: [code])
+  seller       Seller?    @relation(fields: [sellerId], references: [id])
+  user         User?      @relation(fields: [userId], references: [id])
+  ward         Wards?     @relation(fields: [wardCode], references: [code])
+  orders       Order[]
 }
 
 model Auction {
-    id           String   @id @default(uuid())
-    startTime    DateTime
-    endTime      DateTime
-    startPrice   Float
-    minIncrement Float
-
-    productId String
-    winnerId  String?
-    product   Product[] @relation("AuctionToProduct")
-    winner    User?     @relation(fields: [winnerId], references: [id])
-
-    // Những field khác cho phép người dùng đấu giá   
+  id           String    @id @default(uuid())
+  startTime    DateTime
+  endTime      DateTime
+  startPrice   Float
+  minIncrement Float
+  productId    String
+  winnerId     String?
+  winner       User?     @relation(fields: [winnerId], references: [id])
+  product      Product[] @relation("AuctionToProduct")
 }
 
 model Promotion {
-    id              String            @id @default(uuid())
-    name            String
-    description     String?
-    startTime       DateTime
-    endTime         DateTime
-    PromotionDetail PromotionDetail[]
+  id              String            @id @default(uuid())
+  name            String
+  description     String?
+  startTime       DateTime
+  endTime         DateTime
+  PromotionDetail PromotionDetail[]
 }
 
 model PromotionDetail {
-    id                   String                 @id @default(uuid())
-    promotion            Promotion              @relation(fields: [promotionId], references: [id])
-    promotionId          String
-    code                 String
-    type                 PromotionType
-    value                Float
-    createdAt            DateTime               @default(now())
-    applyMonth           Int
-    applyYear            Int
-    remainingUses        Int                    @default(1)
-    OrderPromotionDetail OrderPromotionDetail[]
+  id                   String                 @id @default(uuid())
+  promotionId          String
+  code                 String
+  type                 PromotionType
+  value                Float
+  createdAt            DateTime               @default(now())
+  applyMonth           Int
+  applyYear            Int
+  remainingUses        Int                    @default(1)
+  OrderPromotionDetail OrderPromotionDetail[]
+  promotion            Promotion              @relation(fields: [promotionId], references: [id])
 }
 
 model OrderPromotionDetail {
-    id                String          @id @default(uuid())
-    order             Order           @relation(fields: [orderId], references: [id])
-    orderId           String
-    promotionDetail   PromotionDetail @relation(fields: [promotionDetailId], references: [id])
-    promotionDetailId String
-    discountAmount    Float
-    code              String?
-}
-
-enum PromotionType {
-    PERCENT_OFF
-    AMOUNT_OFF
+  id                String          @id @default(uuid())
+  orderId           String
+  promotionDetailId String
+  discountAmount    Float
+  code              String?
+  order             Order           @relation(fields: [orderId], references: [id])
+  promotionDetail   PromotionDetail @relation(fields: [promotionDetailId], references: [id])
 }
 
 model PaymentTransaction {
-    id            String        @id @default(uuid())
-    amount        Float
-    paid          Boolean?      @default(false)
-    transactionId String?
-    paymentMethod PaymentMethod @default(Other)
-    type          PaymentType?
-    paymentStatus PaymentStatus @default(PENDING)
-    createdAt     DateTime      @default(now())
-    updatedAt     DateTime      @updatedAt
-
-    orderId String
-    order   Order  @relation(fields: [orderId], references: [id])
+  id            String        @id @default(uuid())
+  amount        Float
+  paid          Boolean?      @default(false)
+  transactionId String?
+  paymentMethod PaymentMethod @default(Other)
+  type          PaymentType?
+  paymentStatus PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  orderId       String
+  order         Order         @relation(fields: [orderId], references: [id])
 }
 
 model PaymentMethodDetail {
-    id            String        @id @default(uuid())
-    user          User          @relation(fields: [userId], references: [id])
-    userId        String
-    paymentMethod PaymentMethod
-    apiKey        String?
-    //...
-}
-
-enum PaymentType {
-    ORDER_PAYMENT
-    REFUND
-}
-
-enum PaymentMethod {
-    Wallet
-    CreditCard
-    BankTransfer
-    Other
-}
-
-enum PaymentStatus {
-    PENDING
-    CANCELED
-    COMPLETED
-    FAILED
+  id            String        @id @default(uuid())
+  userId        String
+  paymentMethod PaymentMethod
+  apiKey        String?
+  user          User          @relation(fields: [userId], references: [id])
 }
 
 model Comment {
-    id     String @id @default(uuid())
-    title  String
-    body   String
-    rating Int    @default(0)
-
-    productId String
-    parentId  String?
-    product   Product   @relation(fields: [productId], references: [id])
-    Comment   Comment?  @relation("ReplyToComment", fields: [parentId], references: [id])
-    replies   Comment[] @relation("ReplyToComment")
+  id        String    @id @default(uuid())
+  title     String
+  body      String
+  rating    Int       @default(0)
+  productId String
+  parentId  String?
+  Comment   Comment?  @relation("ReplyToComment", fields: [parentId], references: [id])
+  replies   Comment[] @relation("ReplyToComment")
+  product   Product   @relation(fields: [productId], references: [id])
 }
 
 model MediaFile {
-    id          Int      @id @default(autoincrement())
-    url         String
-    type        String // image, video
-    description String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  url         String
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Administrative_regions {
+  id           Int         @id
+  name         String      @db.VarChar(255)
+  name_en      String      @db.VarChar(255)
+  code_name    String?     @db.VarChar(255)
+  code_name_en String?     @db.VarChar(255)
+  provinces    Provinces[]
+}
+
+model Administrative_units {
+  id            Int         @id
+  full_name     String?     @db.VarChar(255)
+  full_name_en  String?     @db.VarChar(255)
+  short_name    String?     @db.VarChar(255)
+  short_name_en String?     @db.VarChar(255)
+  code_name     String?     @db.VarChar(255)
+  code_name_en  String?     @db.VarChar(255)
+  districts     Districts[]
+  provinces     Provinces[]
+  wards         Wards[]
+}
+
+model Districts {
+  code                   String                @id @db.VarChar(20)
+  name                   String                @db.VarChar(255)
+  name_en                String?               @db.VarChar(255)
+  full_name              String?               @db.VarChar(255)
+  full_name_en           String?               @db.VarChar(255)
+  code_name              String?               @db.VarChar(255)
+  province_code          String?               @db.VarChar(20)
+  administrative_unit_id Int?
+  Address                Address[]
+  administrative_units   Administrative_units? @relation(fields: [administrative_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provinces              Provinces?            @relation(fields: [province_code], references: [code], onDelete: NoAction, onUpdate: NoAction)
+  wards                  Wards[]
+
+  @@index([province_code], map: "idx_districts_province")
+  @@index([administrative_unit_id], map: "idx_districts_unit")
+}
+
+model Provinces {
+  code                     String                  @id @db.VarChar(20)
+  name                     String                  @db.VarChar(255)
+  name_en                  String?                 @db.VarChar(255)
+  full_name                String                  @db.VarChar(255)
+  full_name_en             String?                 @db.VarChar(255)
+  code_name                String?                 @db.VarChar(255)
+  administrative_unit_id   Int?
+  administrative_region_id Int?
+  Address                  Address[]
+  districts                Districts[]
+  administrative_regions   Administrative_regions? @relation(fields: [administrative_region_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  administrative_units     Administrative_units?   @relation(fields: [administrative_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([administrative_region_id], map: "idx_provinces_region")
+  @@index([administrative_unit_id], map: "idx_provinces_unit")
+}
+
+model Wards {
+  code                   String                @id @db.VarChar(20)
+  name                   String                @db.VarChar(255)
+  name_en                String?               @db.VarChar(255)
+  full_name              String?               @db.VarChar(255)
+  full_name_en           String?               @db.VarChar(255)
+  code_name              String?               @db.VarChar(255)
+  district_code          String?               @db.VarChar(20)
+  administrative_unit_id Int?
+  Address                Address[]
+  administrative_units   Administrative_units? @relation(fields: [administrative_unit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  districts              Districts?            @relation(fields: [district_code], references: [code], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([district_code], map: "idx_wards_district")
+  @@index([administrative_unit_id], map: "idx_wards_unit")
+}
+
+enum SellerStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  BLOCKED
+}
+
+enum ProductStatus {
+  ACTIVE
+  SOLD_OUT
+  VIOLATE
+  UNLISTED
+}
+
+enum InOutType {
+  IN
+  OUT
+}
+
+enum OrderStatus {
+  CREATED
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum PromotionType {
+  PERCENT_OFF
+  AMOUNT_OFF
+}
+
+enum PaymentType {
+  ORDER_PAYMENT
+  REFUND
+}
+
+enum PaymentMethod {
+  Wallet
+  CreditCard
+  BankTransfer
+  Other
+}
+
+enum PaymentStatus {
+  PENDING
+  CANCELED
+  COMPLETED
+  FAILED
 }
