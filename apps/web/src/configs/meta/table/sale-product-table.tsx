@@ -1,6 +1,34 @@
+import { productApi } from '@shopizer/apis/product/product';
+import {
+  BACKEND_PRODUCT_IMAGE_PATH,
+  PRODUCT_ENDPOINT,
+  PRODUCT_STATUS,
+  SELLER_PRODUCT_PAGE,
+} from '@shopizer/constants';
+import { SellerDeleteBtn } from '@shopizer/molecules';
 import { TabTable } from '@shopizer/organisms';
+import { Button, Popconfirm, notification } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import Image from 'next/image';
+import Link from 'next/link';
 
+function getPrice(variations: any) {
+  const variationPrice = variations?.map((variation: any) => variation.price);
+  const maxPrice = Math.max(...variationPrice);
+  const minPrice = Math.min(...variationPrice);
+
+  if (variationPrice.length > 1 && maxPrice !== minPrice) {
+    return `${minPrice} - ${maxPrice} đ`;
+  } else {
+    return `${maxPrice || 0} đ`;
+  }
+}
+function getStock(variations: any) {
+  return variations?.reduce(
+    (acc: number, variation: any) => acc + variation.stock,
+    0,
+  );
+}
 const productTable: ColumnsType<{
   // key: string;
   product: any;
@@ -8,43 +36,80 @@ const productTable: ColumnsType<{
   price: number;
   stock: number;
   salesCount: number;
+  image?: string;
 }> = [
   {
     key: 'product',
     title: 'Sản phẩm',
     dataIndex: 'name',
-    width: '30%',
+    width: '40%',
+    render(value, record, index) {
+      return (
+        <div style={{ display: 'flex', gap: 10 }}>
+          {record.image && (
+            <Image
+              src={BACKEND_PRODUCT_IMAGE_PATH + record.image}
+              alt={record.image}
+              style={{ objectFit: 'contain' }}
+              width={60}
+              height={60}
+            />
+          )}
+          <div className='d-flex align-items-center'>
+            <div>{value}</div> 
+          </div>
+        </div>
+      );
+    },
   },
-  {
-    key: 'sku',
-    title: 'SKU',
-    dataIndex: 'sku',
-    width: '15%',
-  },
+  // {
+  //   key: 'sku',
+  //   title: 'SKU',
+  //   dataIndex: 'sku',
+  //   width: '15%',
+  // },
   {
     key: 'price',
     title: 'Giá',
-    dataIndex: 'price',
-    width: '15%',
+    sorter: true,
+    dataIndex: 'ProductVariant',
+    width: '20%',
+    render(value, record, index) {
+      return getPrice(value);
+    },
   },
   {
     key: 'stock',
     title: 'Kho',
-    dataIndex: 'stock',
+    sorter: true,
+    dataIndex: 'ProductVariant',
     width: '12%',
+    render(value, record, index) {
+      return getStock(value);
+    },
   },
-  {
-    key: 'salesCount',
-    title: 'Doanh số',
-    dataIndex: 'salesCount',
-    width: '12%',
-  },
+  // {
+  //   key: 'salesCount',
+  //   title: 'Doanh số',
+  //   sorter: true,
+  //   dataIndex: 'salesCount',
+  //   width: '12%',
+  // },
   {
     key: '123',
     title: '',
-    dataIndex: '',
+    dataIndex: 'id',
     width: '200px',
-    render: () => <a>Xem chi tiết</a>,
+    render: (value) => {
+      return (
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link href={SELLER_PRODUCT_PAGE.EDIT.PATH + value}>
+            <Button>Chỉnh Sửa</Button>
+          </Link>
+          <SellerDeleteBtn productId={value} />
+        </div>
+      );
+    },
   },
 ];
 
@@ -99,37 +164,41 @@ export const saleProductTabTable: TabTable = [
   {
     tabHref: '/seller/product/list',
     tabLabel: 'Tất cả',
-    tableData: [],
     tableCol: productTable,
+    apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
   },
   {
     tabKey: 'active',
     tabLabel: 'Đang hoạt động',
-    tableData: [],
     tableCol: productTable,
+    apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+    baseQuery: '?listType=' + PRODUCT_STATUS.ACTIVE,
   },
   {
     tabKey: 'sold-out',
     tabLabel: 'Hết hàng',
-    tableData: [],
     tableCol: productTable,
+    apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+    baseQuery: '?listType=' + PRODUCT_STATUS.SOLD_OUT,
   },
-  {
-    tabKey: 'reviewing',
-    tabLabel: 'Chờ duyệt',
-    tableData: [],
-    tableCol: productTable,
-  },
+  // {
+  //   tabKey: 'reviewing',
+  //   tabLabel: 'Chờ duyệt',
+  //   tableCol: productTable,
+  //   apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+  // },
   {
     tabKey: 'violate',
     tabLabel: 'Vi phạm',
-    tableData: [],
     tableCol: violateProductTable,
+    apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+    baseQuery: '?listType=' + PRODUCT_STATUS.VIOLATE,
   },
-  {
-    tabKey: 'unlisted',
-    tabLabel: 'Đã ẩn',
-    tableData: [],
-    tableCol: productTable,
-  },
+  // {
+  //   tabKey: 'unlisted',
+  //   tabLabel: 'Đã ẩn',
+  //   tableCol: productTable,
+  //   apiEndpoint: PRODUCT_ENDPOINT.SELLER_LIST,
+  //   baseQuery: '?listType=' + PRODUCT_STATUS.UNLISTED,
+  // },
 ];

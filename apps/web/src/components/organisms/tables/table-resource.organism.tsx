@@ -1,44 +1,85 @@
 'use client';
 
 import { fetcher } from '@shopizer/apis/fetcher';
-import { Table } from 'antd';
+import { Table, TablePaginationConfig } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useMount } from 'react-use';
 import useSWR from 'swr';
 interface OGTableResourceProps {
   columns: any;
-  dataSource: any;
-  apiEndpoint: string;
+  apiEndpoint?: string;
+  baseQuery?: string;
+  isAdminApi?: boolean;
 }
 export function OGTableResource(props: OGTableResourceProps) {
   const [mounted, setMounted] = useState(false);
-  const [query, setQuery] = useState('?page=1');
+  const baseQuery = props.baseQuery || '';
+  const [query, setQuery] = useState(
+    (props.baseQuery ? props.baseQuery + '&' : '?') + 'currentPage=1',
+  );
   const queryRef = useRef(query);
-  const url = `${props.apiEndpoint}`;
-  const [cacheKey, setCacheKey] = useState(null);
+  const url = `${props.apiEndpoint || ''}`;
+  const [cacheKey, setCacheKey] = useState(1);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
   const [sorter, setSorter] = useState(null);
-  const { data } = useSWR(
-    mounted && query ? [cacheKey, url + query] : null,
+  const { data, mutate } = useSWR(
+    mounted && query && url ? [cacheKey, url + query] : null,
     ([key, url]) => {
-      console.log(url);
-      return fetcher(url);
+      return fetcher(url, {}, 'GET', props.isAdminApi ? 'admin' : 'buyer');
     },
   );
+
+  function handlePaginationAndSorter(
+    pagination: TablePaginationConfig,
+    sorter: any,
+  ) {
+    setPagination((s) => ({ ...s, ...pagination }));
+    setSorter(sorter);
+    setQuery(
+      (s) =>
+        `${props.baseQuery ? props.baseQuery + '&' : '?'}currentPage=${
+          pagination.current
+        }&pageSize=${pagination.pageSize}${
+          sorter ? `&sort=${sorter.columnKey}&order=${sorter.order}` : ''
+        }`,
+    );
+  }
   useEffect(() => {
     console.log(data);
+    const { pageSize, currentPage, total } = data || {};
+    data &&
+      setPagination((s) => ({
+        ...s,
+        pageSize,
+        current: currentPage,
+        total,
+      }));
   }, [data]);
+  useEffect(() => {
+    const sub = PubSub.subscribe('reload_table', (msg, data) => {
+      console.log('reload_table');
+      setTimeout(() => mutate(), 100);
+    });
+    return () => {
+      PubSub.unsubscribe(sub);
+    };
+  }, []);
   useMount(() => setMounted(true));
   return (
     <Table
       columns={props.columns}
       rowKey="id"
       dataSource={data?.results || []}
-      pagination={false}
+      onChange={(pagination, filter, sorter, { action }) => {
+        handlePaginationAndSorter(pagination, sorter);
+      }}
+      pagination={{
+        ...pagination,
+      }}
     />
   );
 }

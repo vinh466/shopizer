@@ -8,9 +8,12 @@ import { TContainer } from '..';
 const { Content } = Layout;
 
 const contentStyle: React.CSSProperties = {
-  minHeight: 120,
-  minWidth: 'var(--max-width)',
-  marginTop: 16,
+  minHeight: '120px',
+  marginTop: '16px',
+  backgroundColor: '#f5f5f5',
+  backgroundImage: "url('/auth-bg.png')",
+  backgroundSize: 'cover',
+  backgroundPosition: 'bottom',
 };
 
 export function TMainLayout({ children }: { children: React.ReactNode }) {

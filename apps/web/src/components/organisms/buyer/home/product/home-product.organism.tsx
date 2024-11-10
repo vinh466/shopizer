@@ -6,17 +6,14 @@ import {
   MoneyCollectOutlined,
   GiftOutlined,
 } from '@ant-design/icons';
-import { OGMySuggestProductList } from './my-suggest-product-list/my-suggest-product-list.organism';
+import { OGMySuggestProductList } from './suggest-product-list/my-suggest-product-list.organism';
 import { useEffect, useState } from 'react';
+import { productApi } from '@shopizer/apis/product/product';
+import { OGSellerGroupProductList } from './suggest-product-list/seller-group-product-list.organism';
 
 export function OGHomeProduct() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+  const [loading, setLoading] = useState(false);
+  
   return (
     <div className="home-product">
       <div className="home-product-section suggest">
@@ -37,7 +34,7 @@ export function OGHomeProduct() {
                     </div>
                   ),
                   key: '1',
-                  children: <OGMySuggestProductList loading={loading} />,
+                  children: <OGSellerGroupProductList loading={loading} />,
                 },
                 {
                   label: (
@@ -50,17 +47,17 @@ export function OGHomeProduct() {
                   children: `Tab 1`,
                   disabled: true,
                 },
-                {
-                  label: (
-                    <div className="suggest-tab-item__title">
-                      <MoneyCollectOutlined style={{ margin: 0 }} />
-                      Đấu giá
-                    </div>
-                  ),
-                  key: '3',
-                  children: `Tab 1`,
-                  disabled: true,
-                },
+                // {
+                //   label: (
+                //     <div className="suggest-tab-item__title">
+                //       <MoneyCollectOutlined style={{ margin: 0 }} />
+                //       Đấu giá
+                //     </div>
+                //   ),
+                //   key: '3',
+                //   children: `Tab 1`,
+                //   disabled: true,
+                // },
               ]}
             />
           </Col>

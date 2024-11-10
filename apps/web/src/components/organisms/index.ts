@@ -10,3 +10,9 @@ export * from './product/product.organism';
 
 export * from './buyer/home/category/home-category.organism';
 export * from './buyer/home/product/home-product.organism';
+
+export * from './seller/verify/seller-verify.organism'
+export * from './order/order.organism'
+
+export * from './modals/order-detail-modal.organism'
+export * from './admin/seller-manage.organism'

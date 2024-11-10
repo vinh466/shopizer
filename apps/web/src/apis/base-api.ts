@@ -1,22 +1,23 @@
 import axios, { Method } from 'axios';
 import { notification } from 'antd';
-import { AUTH_ENDPOINT, COMMON_PAGE, RECOIL_KEY } from '@shopizer/constants';
-import refreshTokenApi from './auth/refresh';
+import { AUTH_ENDPOINT,  COMMON_PAGE, RECOIL_KEY } from '@shopizer/constants';
+import { authApi } from './auth/auth';
 import Cookies from 'js-cookie';
 import PubSub from 'pubsub-js';
 import { isNumber } from 'lodash';
 
 async function baseApi<Res = any>(
   endpoint: string,
-  method = 'GET',
   body = {},
+  method: Method = 'GET',
+  app: 'admin' | 'buyer' | 'seller' = 'buyer',
 ): Promise<Res> {
-  const url = 'http://localhost:5000' + endpoint;
-
-  const local = JSON.parse(localStorage.getItem(RECOIL_KEY) || '') ?? null;
-  const token = localStorage.getItem('accessToken') || null;
+  const url = process.env.NEXT_PUBLIC_BACKEND_DOMAIN + endpoint;
+  
+  const local = JSON.parse(localStorage.getItem(RECOIL_KEY) as any) ?? null;
+  const token = app === 'admin' ? local?.adminSessionState?.accessToken : localStorage.getItem('accessToken') || null;
   const refreshToken = localStorage.getItem('refreshToken') || null;
-
+  
   try {
     let headers: any = {
       'Content-type': 'application/json; charset=UTF-8',
@@ -24,7 +25,9 @@ async function baseApi<Res = any>(
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-
+    if (body instanceof FormData) {
+      headers['Content-type'] = 'multipart/form-data';
+    }
     let config: any = {
       method: method,
       headers: headers,
@@ -45,13 +48,16 @@ async function baseApi<Res = any>(
       };
       // Call Refresh Token
       const user = local?.userState ?? null;
-      if (!user) window.location.href = COMMON_PAGE.SIGN_IN.PATH;
+      if (!user) {
+        PubSub.publish('token_expired', null);
+        // window.location.href = COMMON_PAGE.SIGN_IN.PATH;
+      }
       const remember = local?.rememberState ?? null;
       if (!remember) {
         PubSub.publish('token_expired', null);
       } else {
         refreshToken && Cookies.set('Refresh', refreshToken);
-        const result: any = await refreshTokenApi({ email: user.email });
+        const result: any = await authApi.refreshToken({ email: user.email });
 
         if (!isNumber(result.errorStatusCode)) {
           localStorage.setItem('accessToken', result.accessToken);
@@ -60,8 +66,8 @@ async function baseApi<Res = any>(
           // Cookies.set('Authentication', result.accessToken)
           return await baseApi(
             cachePrevRequest.endpoint,
-            cachePrevRequest.method,
             cachePrevRequest.body,
+            cachePrevRequest.method,
           );
         } else {
           // window.location.href = COMMON_PAGE.SIGN_IN.PATH
@@ -84,6 +90,7 @@ async function baseApi<Res = any>(
     }
     // PubSub.publishSync('error_page', response?.status ?? 500);
     return {
+      err,
       message: response?.data?.message ?? "API System's error",
       errorStatusCode: response?.status ?? 500,
       ...response?.data,

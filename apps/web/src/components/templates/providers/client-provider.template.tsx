@@ -1,10 +1,13 @@
 'use client';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilState } from 'recoil';
 import { TThemeProvider } from './theme-provider.template.tsx';
 import { TDevProvider } from './dev-provider.template';
 import { StyledJsxRegistry } from './styled-jsx-registry';
 import { StyledComponentsRegistry } from './styled-component-registry';
 import { TLAuthGuard } from './auth.template.template';
+import { useEffect } from 'react';
+import { sessionState } from '@shopizer/stores';
+import { useRouter } from 'next/navigation';
 
 export const TClientProvider = ({
   children,
@@ -13,11 +16,13 @@ export const TClientProvider = ({
 }) => {
   return (
     <RecoilRoot>
-      <TLAuthGuard>
+      <TLAuthGuard authRequire={false} root>
         <StyledJsxRegistry>
           <StyledComponentsRegistry>
             <TThemeProvider>
-              <TDevProvider>{children}</TDevProvider>
+              {/* <TDevProvider> */}
+                {children}
+                {/* </TDevProvider> */}
             </TThemeProvider>
           </StyledComponentsRegistry>
         </StyledJsxRegistry>

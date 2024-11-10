@@ -1,5 +1,6 @@
 'use client';
 
+import { OGOrder, OGProduct } from '@shopizer/organisms';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -8,7 +9,7 @@ interface SalesOrderPageProps {}
 function SalesOrderPage({}: SalesOrderPageProps) {
   const router = useSearchParams();
 
-  return <div>Sales Order Page: {router.get('type')}</div>;
+  return <OGOrder />;
 }
 
 export default SalesOrderPage;

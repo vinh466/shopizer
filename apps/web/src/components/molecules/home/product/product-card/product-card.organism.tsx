@@ -2,6 +2,9 @@ import { Card, Rate } from 'antd';
 import Image from 'next/image';
 import React from 'react';
 import { FrownOutlined, MehOutlined, SmileOutlined } from '@ant-design/icons';
+import { BACKEND_PRODUCT_IMAGE_PATH } from '@shopizer/constants';
+import ReactImageGallery from 'react-image-gallery';
+import { getProductPrice, getProductPriceString } from '@shopizer/utils/data';
 
 const customIcons: Record<number, React.ReactNode> = {
   1: <FrownOutlined />,
@@ -14,7 +17,9 @@ const customIcons: Record<number, React.ReactNode> = {
 interface OGProductCardProps {
   loading?: boolean;
   gallery?: boolean;
+  product?: any;
 }
+
 
 export function OGProductCard(props: OGProductCardProps) {
   return (
@@ -24,36 +29,65 @@ export function OGProductCard(props: OGProductCardProps) {
         loading={props.loading}
         cover={
           <div className={`product-card__image `}>
-            <Image
-              loading="lazy"
-              alt="example"
-              src="https://salt.tikicdn.com/cache/280x280/ts/product/de/4c/53/dfbb282fbcc1e16a033e3fcc4d99fa32.jpg.webp"
-              width={props.gallery ? '256' : '180'}
-              height={props.gallery ? '256' : '180'}
-            />
+            {props.gallery ? (
+              <ReactImageGallery
+                items={[
+                  {
+                    original:
+                      BACKEND_PRODUCT_IMAGE_PATH + props?.product?.image,
+                    thumbnail:
+                      BACKEND_PRODUCT_IMAGE_PATH + props?.product?.image,
+                  },
+                  ...(props?.product?.imageDesc || []).map((image: string) => ({
+                    original: BACKEND_PRODUCT_IMAGE_PATH + image,
+                    thumbnail: BACKEND_PRODUCT_IMAGE_PATH + image,
+                  })),
+                ]}
+                infinite
+                showNav={false}
+                showPlayButton={false}
+                showFullscreenButton={false}
+              />
+            ) : (
+              <Image
+                loading="lazy"
+                alt="example"
+                src={BACKEND_PRODUCT_IMAGE_PATH + props?.product?.image}
+                width={props.gallery ? '256' : '200'}
+                height={props.gallery ? '256' : '200'}
+                style={{ objectFit: 'contain' }}
+              />
+            )}
           </div>
         }
       >
         {!props.gallery && (
           <>
-            <h3 className="product-card__desc">
-              Máy tăm nước cầm tay Panasonic công nghệ siêu âm EW1511 - Hàng
-              Chính Hãng - Trắng
-            </h3>
-            <Rate
+            <h3 className="product-card__desc">{props.product?.name} </h3>
+            {/* <Rate
               defaultValue={3}
               disabled
               character={({ index }: any) => customIcons[index + 1]}
               style={{ margin: '4px 0' }}
-            />
+            /> */}
             <div className="product-card__price">
-              <span>1.000.000đ</span>
+              <span>
+                {getProductPriceString(props.product?.ProductVariant || [])}
+              </span>
             </div>
           </>
+        )}
+        {props.gallery && (
+          <div className="p-2">
+            <h6>Mô tả</h6>
+            <span>{props.product?.description}</span>
+          </div>
         )}
       </Card>
       <style jsx global>{`
         .product-card {
+          border-radius: 6px;
+          border: 1px solid #f0f0f0;
           .ant-card-body {
             padding: 8px;
           }
@@ -83,9 +117,10 @@ export function OGProductCard(props: OGProductCardProps) {
             -webkit-line-clamp: 2;
             overflow: hidden;
             white-space: break-spaces;
-            font-weight: 400;
-            font-size: 12px;
+            font-weight: 500;
+            font-size: 14px;
             line-height: 150%;
+            min-height: 36px;
             color: rgb(39, 39, 42);
             margin: 0px;
             word-break: break-word;
@@ -95,7 +130,8 @@ export function OGProductCard(props: OGProductCardProps) {
             font-size: 16px;
             line-height: 150%;
             font-weight: 500;
-            color: rgb(39, 39, 42);
+            // color: rgb(39, 39, 42);
+            color: #1890ff;
             margin: 0px;
             display: flex;
             -webkit-box-align: center;

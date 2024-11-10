@@ -7,6 +7,10 @@ export const COMMON_PAGE = {
     PATH: '/cart',
     TITLE: 'Cart',
   },
+  ORDER: {
+    PATH: '/order',
+    TITLE: 'Cart',
+  },
   SIGN_IN: {
     PATH: '/auth/buyer/sign-in',
     TITLE: 'Sign In',
@@ -48,6 +52,22 @@ export const SELLER_PAGE = {
     PATH: '/seller',
     TITLE: 'Seller Dashboard',
   },
+  ORDER: {
+    PATH: '/seller/order',
+    TITLE: 'Seller Order',
+  },
+  SIGN_IN: {
+    PATH: '/auth/seller/sign-in',
+    TITLE: 'Sign In',
+  },
+  SIGN_UP: {
+    PATH: '/auth/seller/sign-up',
+    TITLE: 'Sign Up',
+  },
+  VERIFY: {
+    PATH: '/seller/verify',
+    TITLE: 'Verify',
+  },
 };
 export const SELLER_PRODUCT_PAGE = {
   LIST: {
@@ -55,28 +75,32 @@ export const SELLER_PRODUCT_PAGE = {
     TITLE: 'Seller Product All',
   },
   LIST_ACTIVE: {
-    PATH: '/seller/product/list?type=active',
+    PATH: '/seller/product/list?list=active',
     TITLE: 'Seller Product Active',
   },
   LIST_SOLD_OUT: {
-    PATH: '/seller/product/list?type=sold-out',
+    PATH: '/seller/product/list?list=sold-out',
     TITLE: 'Seller Product Sold Out',
   },
   LIST_VIOLATE: {
-    PATH: '/seller/product/list?type=violate',
+    PATH: '/seller/product/list?list=violate',
     TITLE: 'Seller Product Violate',
   },
   LIST_REVIEWING: {
-    PATH: '/seller/product/list?type=reviewing',
+    PATH: '/seller/product/list?list=reviewing',
     TITLE: 'Seller Product Reviewing',
   },
   LIST_UNLISTED: {
-    PATH: '/seller/product/list?type=unlisted',
+    PATH: '/seller/product/list?list=unlisted',
     TITLE: 'Seller Product Unlisted',
   },
   ADD: {
     PATH: '/seller/product/add',
     TITLE: 'Seller Product Add',
+  },
+  EDIT: {
+    PATH: '/seller/product/edit/',
+    TITLE: 'Seller Product All',
   },
 };
 
@@ -85,28 +109,24 @@ export const SELLER_ORDER_PAGE = {
     PATH: '/seller/order',
     TITLE: 'Seller Order',
   },
-  LIST_UNPAID: {
-    PATH: '/seller/order?type=unpaid',
-    TITLE: 'Seller Order (unpaid)',
-  },
-  LIST_TOSHIP: {
-    PATH: '/seller/order?type=toship',
+  LIST_PROCESSING: {
+    PATH: '/seller/order?list=PROCESSING',
     TITLE: 'Seller Order (toship)',
   },
   LIST_SHIPPING: {
-    PATH: '/seller/order?type=shipping',
+    PATH: '/seller/order?list=SHIPPED',
     TITLE: 'Seller Order (shipping)',
   },
   LIST_COMPLETED: {
-    PATH: '/seller/order?type=completed',
+    PATH: '/seller/order?list=DELIVERED',
     TITLE: 'Seller Order (completed)',
   },
   LIST_CANCELLED: {
-    PATH: '/seller/order?type=cancelled',
+    PATH: '/seller/order?list=CANCELED',
     TITLE: 'Seller Order (cancelled)',
   },
   LIST_RETURN_LIST: {
-    PATH: '/seller/order?type=return-list',
+    PATH: '/seller/order?list=return-list',
     TITLE: 'Seller Order (return-list)',
   },
 };
@@ -118,5 +138,20 @@ export const SELLER_SHOP_PAGE = {
   RATING: {
     PATH: '/seller/shop/rating',
     TITLE: 'Seller Shop Rating',
+  },
+};
+
+export const ADMIN_PAGE = {
+  DASHBOARD: {
+    PATH: '/admin',
+    TITLE: 'Admin Dashboard',
+  },
+  SIGN_IN: {
+    PATH: '/auth/admin/sign-in',
+    TITLE: 'Sign In',
+  },
+  SIGN_UP: {
+    PATH: '/auth/admin/sign-up',
+    TITLE: 'Sign Up',
   },
 };
