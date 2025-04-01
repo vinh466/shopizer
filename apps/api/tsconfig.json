@@ -1,20 +1,34 @@
 {
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
     "target": "es2017",
     "outDir": "./dist",
     "baseUrl": "./src",
     "alwaysStrict": true,
     // "noImplicitAny": true,
-    "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
     "paths": {
-      "@shopizer/*": ["./common/*"],
-      "@shopizer/modules/*": ["./modules/*"]
+      "@shopizer/*": [
+        "./common/*"
+      ],
+      "@shopizer/modules/*": [
+        "./modules/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"],
-  "files": ["src/index.d.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "src/index.d.ts"
+  ]
 }

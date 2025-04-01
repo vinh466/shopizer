@@ -1,13 +1,13 @@
-import * as bodyParser from "body-parser";
-import * as cookieParser from "cookie-parser";
-import * as express from "express";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import express from "express";
 import { RouteDefinition } from "@shopizer/types/controller.interface";
 import errorMiddleware from "@shopizer/middleware/error.middleware";
 import { prisma } from "@shopizer/helpers/prisma.helper";
-import * as morgan from "morgan";
+import morgan from "morgan";
 import "reflect-metadata";
 import * as path from "path";
-import * as cors from "cors";
+import cors from "cors";
 
 import {
   CONTROLLER_KEY,
@@ -15,7 +15,7 @@ import {
   MIDDLEWARE_KEY,
 } from "@shopizer/decorators";
 class App {
-  public app: express.Application;
+  public app: any;
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(controllers: Function[]) {
