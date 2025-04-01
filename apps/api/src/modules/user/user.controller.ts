@@ -83,7 +83,8 @@ class UserController {
     FileUploadMiddleware({
       fields: [{ name: "seller-avatar", maxCount: 1 }],
       dest: "images/seller",
-    }))
+      sizeLimit: 5,
+    }) as any)
   async updateSellerImage(request: Request, response: Response, next: NextFunction) {
     const file = request.files?.["seller-avatar"]?.[0];
     if (file === undefined) {

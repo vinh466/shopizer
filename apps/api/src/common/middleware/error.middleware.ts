@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request } from "express";
 import HttpException from "@shopizer/helpers/HttpException";
 
 function errorMiddleware(
   error: HttpException,
   request: Request,
-  response: Response,
+  response: any,
   next: NextFunction
 ) {
   const status = error.status || 500;

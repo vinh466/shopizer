@@ -111,7 +111,7 @@ class ProductController {
     FileUploadMiddleware({
       fields: [{ name: "product", maxCount: 1 }],
       dest: "images/products",
-    })
+    }) as any
   )
   async updateImage(request: Request, response: Response) {
     const file = request.files?.["product"]?.[0];

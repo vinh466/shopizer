@@ -1,0 +1,34 @@
+version: '1.0'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shopizer_api
+    ports:
+      - "3100:3100"
+    env_file:
+      - .env
+    networks:
+      - default
+
+  db:
+    image: postgres:latest
+    container_name: shopizer_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: shopizer
+      POSTGRES_PASSWORD: shopizer
+      POSTGRES_DB: shopizer
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+networks:
+  default:
+    name: shopizer_default
+
+volumes:
+  db_data:
+    name: shopizer_db_data
