@@ -1,0 +1,35 @@
+# Bỏ thư mục node_modules để tránh copy vào container
+node_modules
+npm-debug.log
+pnpm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Bỏ các thư mục build cũ hoặc không cần thiết
+dist
+.build
+.cache
+
+# Bỏ các file env (chỉ nên truyền qua biến môi trường)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Bỏ logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Bỏ các thư mục của Git
+.git
+.gitignore
+
+# Bỏ editor config và các file hệ thống
+.DS_Store
+.vscode
+.idea
+*.swp
