@@ -1,6 +1,6 @@
 import axios, { Method } from 'axios';
 import { notification } from 'antd';
-import { AUTH_ENDPOINT,  COMMON_PAGE, RECOIL_KEY } from '@shopizer/constants';
+import { AUTH_ENDPOINT, BACKEND_DOMAIN, COMMON_PAGE, RECOIL_KEY } from '@shopizer/constants';
 import { authApi } from './auth/auth';
 import Cookies from 'js-cookie';
 import PubSub from 'pubsub-js';
@@ -12,12 +12,12 @@ async function baseApi<Res = any>(
   method: Method = 'GET',
   app: 'admin' | 'buyer' | 'seller' = 'buyer',
 ): Promise<Res> {
-  const url = process.env.NEXT_PUBLIC_BACKEND_DOMAIN + endpoint;
-  
+  const url = BACKEND_DOMAIN + endpoint;
+
   const local = JSON.parse(localStorage.getItem(RECOIL_KEY) as any) ?? null;
   const token = app === 'admin' ? local?.adminSessionState?.accessToken : localStorage.getItem('accessToken') || null;
   const refreshToken = localStorage.getItem('refreshToken') || null;
-  
+
   try {
     let headers: any = {
       'Content-type': 'application/json; charset=UTF-8',

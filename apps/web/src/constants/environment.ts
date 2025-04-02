@@ -1,4 +1,4 @@
-export const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_DOMAIN || 'http://localhost:5000';
+export const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_DOMAIN || 'http://localhost:3100';
 
 export const BACKEND_CATEGORY_IMAGE_PATH = BACKEND_DOMAIN + (process.env.NEXT_PUBLIC_BACKEND_CATEGORY_IMAGE_PATH || '/images/categories/');
 
